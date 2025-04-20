@@ -1,26 +1,41 @@
-<?php if(!defined("ABSPATH")) exit; ?>
+<?php if (!defined("ABSPATH")) exit; ?>
 <!DOCTYPE html>
-<html lang="<?php  language_attributes( ); ?> ">
+<html lang="<?php language_attributes(); ?> ">
 
 <head>
-    <meta charset=" <?php bloginfo( 'charset' ) ?>">
+    <meta charset=" <?php bloginfo('charset') ?>">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <?php wp_head(  )?>
+    <?php wp_head() ?>
 </head>
 
 <body>
-    <div class="email">
-        <form class="invite_form">
-            <input class="email_input" type="email">
-            <button class="email_invite_btn" type="submit">invite</button>
-        </form>
-    </div>
 
+    <button class="create_team_btn">Create Team</button>
+    <div class="list"></div>
 
-    <?php  wp_mail( 'smhasib1999@gmail.com', "test", "test_msg", "header", "attachments" );?>
-
-    <?php wp_footer(  );?>
+    <?php wp_footer(); ?>
 
 </body>
 
 </html>
+
+
+<!-- 
+<form method="post">
+    <label for="username">Username:</label>
+    <input type="text" name="username" required>
+
+    <label for="email">Email:</label>
+    <input type="email" name="email" required>
+
+    <label for="password">Password:</label>
+    <input type="password" name="password" required>
+
+    <?php
+    //  wp_nonce_field('custom_register_action', 'custom_register_nonce');
+    ?>
+
+    <button type="submit">Register</button>
+</form>
+
+ -->
