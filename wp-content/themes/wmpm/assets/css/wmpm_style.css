@@ -1,3 +1,10 @@
+.container{
+    display: flex;
+    background: #dac1c18e;
+}
+
+
+
 button{
     border: none;
     background: black;
@@ -6,3 +13,15 @@ button{
     padding: 8px 20px;
 }
 
+input{
+border: none;
+}
+input:focus{
+outline: none;
+}
+
+/* Solid border */
+hr.solid {
+    border-top: 3px solid #030000;
+    z-index: 9999;
+  }

@@ -40,113 +40,188 @@ function add_team()
 
 add_action('wp_ajax_add_team', 'add_team');
 
+
+
 /**
  * Register custom post type 'team' for team members
  */
-function register_team_post_type()
+
+
+function team_custom_post_type()
 {
-    $labels = array(
-        'name'               => 'Team Members',
-        'singular_name'      => 'Team Member',
-        'menu_name'          => 'Team',
-        'add_new'            => 'Add New',
-        'add_new_item'       => 'Add New Team Member',
-        'edit_item'          => 'Edit Team Member',
-        'new_item'           => 'New Team Member',
-        'view_item'          => 'View Team Member',
-        'search_items'       => 'Search Team Members',
-        'not_found'          => 'No team members found',
-        'not_found_in_trash' => 'No team members found in Trash',
-    );
-
-    $args = array(
-        'labels'              => $labels,
-        'public'              => true,
-        'publicly_queryable'  => true,
-        'show_ui'             => true,
-        'show_in_menu'        => true,
-        'query_var'           => true,
-        'rewrite'             => array('slug' => 'team'),
-        'capability_type'     => 'post',
-        'has_archive'         => true,
-        'hierarchical'        => false,
-        'menu_position'       => null,
-        'menu_icon'           => 'dashicons-groups',
-        'supports'            => array('title'), // Only title support, no editor
-    );
-
-    register_post_type('team', $args);
-}
-add_action('init', 'register_team_post_type');
-
-/**
- * Add meta box for team member email
- */
-function add_team_meta_boxes()
-{
-    add_meta_box(
-        'team_email_meta_box',
-        'Team Member Email',
-        'display_team_email_meta_box',
+    register_post_type(
         'team',
-        'normal',
-        'high'
+        array(
+            'labels'      => array(
+                'name'          => __('Team', 'textdomain'),
+                'singular_name' => __('Team', 'textdomain'),
+            ),
+            'public'      => true,
+            'has_archive' => true,
+            'supports'    => array('title'),
+        )
+    );
+
+    register_post_type(
+        'projects',
+        array(
+            'labels'      => array(
+                'name'          => __('Projects', 'textdomain'),
+                'singular_name' => __('Project', 'textdomain'),
+            ),
+            'public'      => true,
+            'has_archive' => true,
+            'supports'    => array('title', 'editor'),
+        )
     );
 }
-add_action('add_meta_boxes', 'add_team_meta_boxes');
 
-/**
- * Display team member email meta box
- */
-
-
-function display_team_email_meta_box($post)
-{
-    // Add nonce for security
-    wp_nonce_field('team_email_meta_box', 'team_email_meta_box_nonce');
-
-    // Get the saved email value if exists
-    $email = get_post_meta($post->ID, '_team_member_email', true);
-
-    // Output the email field
-?>
-    <p>
-        <label for="team_member_email">Email Address:</label>
-        <input type="email" id="team_member_email" name="team_member_email" value="<?php echo esc_attr($email); ?>" size="40" />
-    </p>
-<?php
-}
+add_action('init', 'team_custom_post_type');
 
 
 /**
- * Save the team member email meta data
+ * Create a new team post
  */
-function save_team_meta_data($post_id)
+function create_team_post()
 {
-    // Check if nonce is set
-    if (!isset($_POST['team_email_meta_box_nonce'])) {
+
+    if (!isset($_POST['action']) || $_POST['action'] !== 'create_team') {
+        wp_send_json_error(['message' => 'Invalid request.']);
+        wp_die();
+    }
+
+    $team_name = sanitize_text_field($_POST['team_name']);
+
+    if (post_exists($team_name)) {
+        wp_send_json_error(['message' => 'Team ' . $team_name . ' ALready  Exist.']);
+        wp_die();
+    }
+    // Post data array
+    $team_post = array(
+        'post_title'    => $team_name,        // The title of the post
+        'post_status'   => 'publish',         // Published status
+        'post_type'     => 'team',            // Your custom post type
+        'post_author'   => 1,                 // Default admin user ID
+    );
+
+
+    // Insert the post into the database
+    $post_id = wp_insert_post($team_post);
+
+    // Check for errors
+    if (is_wp_error($post_id)) {
+        // Handle error
+        error_log('Failed to create team post: ' . $post_id->get_error_message());
         return;
     }
 
-    // Verify nonce
-    if (!wp_verify_nonce($_POST['team_email_meta_box_nonce'], 'team_email_meta_box')) {
-        return;
-    }
+    //create post meta with empty array
+    update_post_meta($post_id, 'member_email_array', []);
 
-    // Check if auto save
-    if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
-        return;
-    }
-
-    // Check user permission
-    if (!current_user_can('edit_post', $post_id)) {
-        return;
-    }
-
-    // Save the email if set
-    if (isset($_POST['team_member_email'])) {
-        $email = sanitize_email($_POST['team_member_email']);
-        update_post_meta($post_id, '_team_member_email', $email);
-    }
+    wp_send_json_success([
+        'message' => $post_id
+    ]);
+    wp_die();
 }
-add_action('save_post_team', 'save_team_meta_data');
+
+// Call this function whenever you want to create a team post
+
+add_action('wp_ajax_create_team', 'create_team_post');
+
+
+/**
+ * add  email of member
+ */
+function add_team_member()
+{
+
+    if (!isset($_POST['action']) || $_POST['action'] !== 'add_team_member') {
+        wp_send_json_error(['message' => 'Invalid request.']);
+        wp_die();
+    }
+
+    $post_id = sanitize_text_field($_POST['team_id']);
+    $email = sanitize_email($_POST['email']);
+
+    $email_array = get_post_meta($post_id, 'member_email_array', true);
+
+    if (in_array($email, $email_array)) {
+        wp_send_json_error(['message' => 'User Already exists']);
+        wp_die();
+    }
+
+    $email_array[] = $email; // Step 3: Push new email
+
+    // Step 4: Save back
+    update_post_meta($post_id, 'member_email_array', $email_array);
+
+
+    wp_send_json_success(['message' => $email . ' added']);
+    wp_die();
+}
+
+// Call this function whenever you want to create a team post
+
+add_action('wp_ajax_add_team_member', 'add_team_member');
+
+
+
+
+
+
+/* ====================create project =========================== */
+
+
+/**
+ * Create a new project post
+ */
+
+
+function create_project_post()
+{
+
+    if (!isset($_POST['action']) || $_POST['action'] !== 'create_project') {
+        wp_send_json_error(['message' => 'Invalid request.']);
+        wp_die();
+    }
+
+
+    $project_name = sanitize_text_field($_POST['project_name']);
+
+
+    if (post_exists($project_name)) {
+        wp_send_json_error(['message' => 'Team ' . $project_name . ' ALready  Exist.']);
+        wp_die();
+    }
+    // Post data array
+    $project_post = array(
+        'post_title'    => $project_name,        // The title of the post
+        'post_content'  => '',
+        'post_status'   => 'publish',         // Published status
+        'post_type'     => 'projects',            // Your custom post type
+        'post_author'   => 1,                 // Default admin user ID
+    );
+
+
+    // Insert the post into the database
+    $post_id = wp_insert_post($project_post);
+
+    // Check for errors
+    if (is_wp_error($post_id)) {
+        // Handle error
+        error_log('Failed to create project post: ' . $post_id->get_error_message());
+        return;
+    }
+
+    //create post meta with empty array
+    update_post_meta($post_id, 'member_email_array', []);
+
+    wp_send_json_success([
+        'message' => $post_id
+    ]);
+    wp_die();
+}
+
+// Call this function whenever you want to create a project post
+
+add_action('wp_ajax_create_project', 'create_project_post');

@@ -165,3 +165,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     wp_mail($email, "Invitation in the team", $message, $headers, "");
 }
+
+
+$email_array = get_post_meta($post_id, 'my_email_array', true);
+
+// Now you can loop through it
+foreach ($email_array as $email) {
+    echo esc_html($email) . '<br>';
+}
