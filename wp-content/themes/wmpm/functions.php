@@ -19,8 +19,6 @@ function generateRandomString($length = 10)
 
 
 
-
-
 function add_team()
 {
     if (!isset($_POST['action']) || $_POST['action'] !== 'add_team') {
@@ -214,7 +212,11 @@ function create_project_post()
     }
 
     //create post meta with empty array
-    update_post_meta($post_id, 'member_email_array', []);
+    update_post_meta($post_id, 'member_array', []);
+    update_post_meta($post_id, 'description', '');
+    update_post_meta($post_id, 'due_date', '');
+    update_post_meta($post_id, 'priority_array', ['low','medium','high']);
+    update_post_meta($post_id, 'progress_array', ['started','In progress','Done']);
 
     wp_send_json_success([
         'message' => $post_id
@@ -225,3 +227,5 @@ function create_project_post()
 // Call this function whenever you want to create a project post
 
 add_action('wp_ajax_create_project', 'create_project_post');
+
+// function
