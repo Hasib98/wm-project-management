@@ -72,8 +72,9 @@
     <br>
 
     <div class="container">
-        <input type="text">
-        <?php
+        <form id="project_details_form">
+            <input type="text">
+            <?php
                 // Custom query to get team posts
                 $args = array(
                     'post_type' => 'project',
@@ -87,25 +88,75 @@
 
                 // Check if we have posts
                 if ($project_query->have_posts()) : ?>
-        <select name="project" id="project">
-            <?php
+            <select name="project" id="project">
+                <?php
                         // Start the loop
                         while ($project_query->have_posts()) : $project_query->the_post();
                             // Get the post ID
                             $post_id = get_the_ID();
                         ?>
-            <option value="<?php echo $post_id; ?>"><?php the_title(); ?></option>
-            <?php endwhile; ?>
-            <?php
+                <option value="<?php echo $post_id; ?>"><?php the_title(); ?></option>
+                <?php endwhile; ?>
+                <?php
                     // Reset post data
                     wp_reset_postdata();
 
                 else : ?>
-            <p>No teams found.</p>
-            <?php endif; ?>
-        </select>
-    </div>
+                <p>No teams found.</p>
+                <?php endif; ?>
+            </select>
+            <textarea name="projectd_details" id="projectd_details"></textarea>
+            <input type="date" name="due_date" id="due_date">
+            <select name="priority" id="priority">
+                <option value="low">low</option>
+                <option value="medium">medium</option>
+                <option value="high">high</option>
+            </select>
+            <select name="status" id="status">
+                <option value="started">started</option>
+                <option value="In progress">In progress</option>
+                <option value="Done">Done</option>
+            </select>
 
+            <?php
+                // Custom query to get team posts
+                $args = array(
+                    'post_type' => 'team',
+                    'posts_per_page' => -1, // Get all posts. You can limit this if needed
+                    'post_status' => 'publish',
+                    'orderby' => 'title',
+                    'order' => 'ASC'
+                );
+
+                $team_query = new WP_Query($args);
+
+                // Check if we have posts
+                if ($team_query->have_posts()) : ?>
+            <select name="teams" id="selected_team">
+                <?php
+                        // Start the loop
+                        while ($team_query->have_posts()) : $team_query->the_post();
+                            // Get the post ID
+                            $post_id = get_the_ID();
+                        ?>
+                <option value="<?php echo $post_id; ?>"><?php the_title(); ?></option>
+                <?php endwhile; ?>
+                <?php
+                    // Reset post data
+                    wp_reset_postdata();
+
+                else : ?>
+                <p>No teams found.</p>
+                <?php endif; ?>
+            </select>
+            <select name="mebmber" id="member">
+                <!-- <option value="test@test.com">test@test.com</option>
+                <option value="alpha@beta.com">alpha@beta.com</option>
+                <option value="gama@nautt.com">gama@nautt.com</option> -->
+            </select>
+            <button type="submit">Submit</button>
+        </form>
+    </div>
 
 
     <?php wp_footer(); ?>

@@ -213,10 +213,10 @@ function create_project_post()
 
     //create post meta with empty array
     update_post_meta($post_id, 'member_array', []);
-    update_post_meta($post_id, 'description', '');
+    update_post_meta($post_id, 'details', '');
     update_post_meta($post_id, 'due_date', '');
     update_post_meta($post_id, 'priority_array', ['low','medium','high']);
-    update_post_meta($post_id, 'progress_array', ['started','In progress','Done']);
+    update_post_meta($post_id, 'status', ['started','In progress','Done']);
 
     wp_send_json_success([
         'message' => $post_id
@@ -229,3 +229,30 @@ function create_project_post()
 add_action('wp_ajax_create_project', 'create_project_post');
 
 // function
+
+
+
+function get_team_member()
+{
+
+    if (!isset($_POST['action']) || $_POST['action'] !== 'get_team_member') {
+        wp_send_json_error(['message' => 'Invalid request.']);
+        wp_die();
+    }
+
+
+    $post_id = sanitize_text_field($_POST['team_id']);
+
+    $email_array = get_post_meta($post_id, 'member_email_array', true);
+
+    
+
+    wp_send_json_success([
+        'message' => $email_array
+    ]);
+    wp_die();
+}
+
+// Call this function whenever you want to create a project post
+
+add_action('wp_ajax_get_team_member', 'get_team_member');
