@@ -58,10 +58,8 @@
 
         <!-- create project -->
         <div>
-
             <button class="create_project_btn">Create Project</button>
             <div class="project_list"></div>
-
             <br>
             <br>
             <br>
@@ -73,11 +71,11 @@
 
     <div class="container">
         <form id="project_details_form">
-            <input type="text">
+            <!-- <input type="text"> -->
             <?php
                 // Custom query to get team posts
                 $args = array(
-                    'post_type' => 'project',
+                    'post_type' => 'projects',
                     'posts_per_page' => -1, // Get all posts. You can limit this if needed
                     'post_status' => 'publish',
                     'orderby' => 'title',
@@ -117,7 +115,6 @@
                 <option value="In progress">In progress</option>
                 <option value="Done">Done</option>
             </select>
-
             <?php
                 // Custom query to get team posts
                 $args = array(
@@ -158,6 +155,44 @@
         </form>
     </div>
 
+    <div class="container project_list">
+    <ul>
+    <?php
+                // Custom query to get team posts
+                $args = array(
+                    'post_type' => 'projects',
+                    'posts_per_page' => -1, // Get all posts. You can limit this if needed
+                    'post_status' => 'publish',
+                    'orderby' => 'title',
+                    'order' => 'ASC'
+                );
+
+                $project_query = new WP_Query($args);
+
+                // Check if we have posts
+                if ($project_query->have_posts()) : 
+    ?>
+    <?php
+                        // Start the loop
+                        while ($project_query->have_posts()) : $project_query->the_post();
+                            // Get the post ID
+                            $post_id = get_the_ID();
+                            $post_link =  get_post_permalink();
+    ?>
+                <li><a href="<?php echo $post_link; ?>"><?php the_title(); ?></a></li> 
+                <?php endwhile; ?>
+                <?php
+                    // Reset post data
+                    wp_reset_postdata();
+
+                else : ?>
+                <p>No teams found.</p>
+                <?php endif; ?>
+                </ul>
+        
+      
+       
+    </div>
 
     <?php wp_footer(); ?>
 

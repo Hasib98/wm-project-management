@@ -19,7 +19,7 @@ function generateRandomString($length = 10)
 
 
 
-function add_team()
+/* function add_team()
 {
     if (!isset($_POST['action']) || $_POST['action'] !== 'add_team') {
         wp_send_json_error(['message' => 'Invalid request.']);
@@ -37,6 +37,9 @@ function add_team()
 
 
 add_action('wp_ajax_add_team', 'add_team');
+
+*/
+
 
 
 
@@ -91,7 +94,7 @@ function create_team_post()
     $team_name = sanitize_text_field($_POST['team_name']);
 
     if (post_exists($team_name)) {
-        wp_send_json_error(['message' => 'Team ' . $team_name . ' ALready  Exist.']);
+        wp_send_json_error(['message' => 'Team ' . $team_name . ' Already  Exist.']);
         wp_die();
     }
     // Post data array
@@ -212,12 +215,12 @@ function create_project_post()
     }
 
     //create post meta with empty array
+    // update_post_meta($post_id, 'member_array', []);
+    // update_post_meta($post_id, 'details', '');
+    // update_post_meta($post_id, 'due_date', '');
+    // update_post_meta($post_id, 'priority_array', ['low','medium','high']);
+    // update_post_meta($post_id, 'status', ['started','In progress','Done']);
     update_post_meta($post_id, 'member_array', []);
-    update_post_meta($post_id, 'details', '');
-    update_post_meta($post_id, 'due_date', '');
-    update_post_meta($post_id, 'priority_array', ['low','medium','high']);
-    update_post_meta($post_id, 'status', ['started','In progress','Done']);
-
     wp_send_json_success([
         'message' => $post_id
     ]);
@@ -227,8 +230,6 @@ function create_project_post()
 // Call this function whenever you want to create a project post
 
 add_action('wp_ajax_create_project', 'create_project_post');
-
-// function
 
 
 
@@ -256,3 +257,54 @@ function get_team_member()
 // Call this function whenever you want to create a project post
 
 add_action('wp_ajax_get_team_member', 'get_team_member');
+
+
+
+
+
+function update_project()
+{
+
+    if (!isset($_POST['action']) || $_POST['action'] !== 'update_project') {
+        wp_send_json_error(['message' => 'Invalid request.']);
+        wp_die();
+    }
+
+
+    $post_id = intval(sanitize_text_field($_POST['project_id']));
+    $project_details = sanitize_textarea_field($_POST['projectd_details']);
+    $due_date = $_POST['due_date'];
+    $priority = $_POST['priority'];
+    $status = $_POST['status'];
+    // $selected_team = $_POST['selected_team'];
+    $member_email = $_POST['member'];
+
+
+    $email_array = get_post_meta($post_id, 'member_array', true);
+
+    if (in_array($member_email, $email_array)) {
+        wp_send_json_error(['message' => 'Member Already exists']);
+        wp_die();
+    }
+    $email_array[] = $member_email; // Step 3: Push new email
+
+    // Step 4: Save back
+
+
+/*     $email_array = get_post_meta($post_id, 'member_array', true);
+
+    $email_array = array_push($email_array,$member_email);  */
+   
+     update_post_meta($post_id, 'details', $project_details);
+     update_post_meta($post_id, 'due_date', $due_date);
+     update_post_meta($post_id, 'priority', $priority);
+     update_post_meta($post_id, 'status', $status);
+     update_post_meta($post_id, 'member_array', $email_array);
+
+    wp_send_json_success([
+        'message' => $post_id
+    ]);
+    wp_die();
+}
+
+add_action('wp_ajax_update_project', 'update_project');
