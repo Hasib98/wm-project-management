@@ -1,0 +1,18 @@
+.msp-box {
+    background-color: #f5f5f5;
+    padding: 20px;
+    text-align: center;
+    border-radius: 10px;
+}
+
+#msp-button {
+    background-color: #0073aa;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+}
+
+#msp-button:hover {
+    background-color: #005177;
+}

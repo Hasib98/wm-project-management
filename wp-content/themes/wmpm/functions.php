@@ -3,8 +3,6 @@ if (!defined("ABSPATH")) exit;
 
 include_once('inc/default.php');
 include_once('inc/enqueue.php');
-
-
 function generateRandomString($length = 10)
 {
     $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -14,8 +12,6 @@ function generateRandomString($length = 10)
     }
     return $randomString;
 }
-
-
 
 
 
@@ -289,7 +285,7 @@ function update_project()
     $email_array[] = $member_email; // Step 3: Push new email
 
     // Step 4: Save back
-
+    
 
 /*     $email_array = get_post_meta($post_id, 'member_array', true);
 
