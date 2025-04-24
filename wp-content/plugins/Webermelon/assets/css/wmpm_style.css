@@ -1,0 +1,41 @@
+
+/* ====================****================== */
+
+
+#wmpm_app{
+    background: rgb(184, 160, 160);
+    height: 100vh;
+}
+#wmpm_app .container {
+
+}
+
+
+
+#wmpm_app .container button {
+    border: none;
+    background: black;
+    color: white;
+    border-radius: 15px;
+    padding: 8px 20px;
+}
+
+#wmpm_app .container input {
+  /* border: none; */
+}
+
+
+#wmpm_app .container input:focus {
+    outline: none;
+}
+
+/* Solid border */
+#wmpm_app .container hr.solid {
+    border-top: 3px solid #030000;
+    z-index: 9999;
+}
+
+#wmpm_app .container .container:nth-child(2) form {
+    display: flex;
+    flex-direction: column;
+}
