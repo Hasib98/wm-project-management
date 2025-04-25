@@ -1,4 +1,3 @@
-
 /* ======================create Project =========================*/
 
 const createProjectBtn = document.querySelector(".create_project_btn");
@@ -81,6 +80,7 @@ createTeamBtn.addEventListener("click", function () {
 
       if (data.success) {
         console.log("Server Response:", data);
+        alert(data.data.message);
       } else {
         alert(data.message);
       }
@@ -101,7 +101,7 @@ teamMemberForm.addEventListener("submit", async function (e) {
   const formData = new FormData();
   formData.append("email", inputAddMember.value);
   formData.append("team_id", team_id.value);
-  formData.append("action", "add_team_member");
+  formData.append("action", "send_invite");
 
   try {
     const response = await fetch(ajax_object.ajax_url, {
@@ -128,67 +128,63 @@ teamMemberForm.addEventListener("submit", async function (e) {
 
 const selectedTeam = document.getElementById("selected_team");
 
-selectedTeam.addEventListener("change", async function () { 
+if (selectedTeam) {
+  selectedTeam.addEventListener("change", async function () {
+    // alert("test");
+    const team_id = this.value;
 
+    const formData = new FormData();
+    formData.append("team_id", team_id);
+    formData.append("action", "get_team_member");
 
-  // alert("test");
-  const team_id = this.value;
-
-  const formData = new FormData();
-  formData.append("team_id", team_id);
-  formData.append("action", "get_team_member");
-
-  try {
-    const response = await fetch(ajax_object.ajax_url, {
-      method: "POST",
-      body: formData,
-    });
-
-    const data = await response.json();
-
-    if (data.success) {
-      // console.log("Server Response:", data);
-      // alert(data.data.message);
-      const selectElement = document.getElementById("member");
-
-      
-
-
-      // Clear existing options
-      selectElement.innerHTML = "";
-      const emails =  data.data.message
-
-      // Add new options from the array
-      emails.forEach((email) => {
-        const option = document.createElement("option");
-        option.classList.add("option_email");
-        option.value = email;
-        option.textContent = email; // Using the same email for the display text
-        selectElement.appendChild(option);
+    try {
+      const response = await fetch(ajax_object.ajax_url, {
+        method: "POST",
+        body: formData,
       });
-    } else {
-      console.log(data.data.message);
-      // alert(data.data.message);
+
+      const data = await response.json();
+
+      if (data.success) {
+        // console.log("Server Response:", data);
+        // alert(data.data.message);
+        const selectElement = document.getElementById("member");
+
+        // Clear existing options
+        selectElement.innerHTML = "";
+        const emails = data.data.message;
+
+        // Add new options from the array
+        emails.forEach((email) => {
+          const option = document.createElement("option");
+          option.classList.add("option_email");
+          option.value = email;
+          option.textContent = email; // Using the same email for the display text
+          selectElement.appendChild(option);
+        });
+      } else {
+        console.log(data.data.message);
+        // alert(data.data.message);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("An error occurred. Please try again.");
     }
-  } catch (error) {
-    console.error("Error:", error);
-    alert("An error occurred. Please try again.");
-  }
-});
+  });
+}
 
-const  updateProject = document.getElementById('project_details_form');
+const updateProject = document.getElementById("project_details_form");
 
- updateProject.addEventListener('submit' ,  async function(e){
+updateProject.addEventListener("submit", async function (e) {
   e.preventDefault();
 
-  const project_id = document.getElementById('project').value;
-  const projectd_details = document.getElementById('projectd_details').value;
-  const due_date = document.getElementById('due_date').value;
-  const priority = document.getElementById('priority').value;
-  const status = document.getElementById('status').value;
+  const project_id = document.getElementById("project").value;
+  const projectd_details = document.getElementById("projectd_details").value;
+  const due_date = document.getElementById("due_date").value;
+  const priority = document.getElementById("priority").value;
+  const status = document.getElementById("status").value;
   // const selected_team = document.getElementById('selected_team').value;
-  const member = document.getElementById('member').value;
-
+  const member = document.getElementById("member").value;
 
   const formData = new FormData();
   formData.append("project_id", project_id);
@@ -219,6 +215,4 @@ const  updateProject = document.getElementById('project_details_form');
     console.error("Error:", error);
     alert("An error occurred. Please try again.");
   }
-
-
- })
+});
