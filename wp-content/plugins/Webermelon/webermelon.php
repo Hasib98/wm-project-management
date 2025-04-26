@@ -367,30 +367,15 @@ function update_project()
     $due_date = $_POST['due_date'];
     $priority = $_POST['priority'];
     $status = $_POST['status'];
-    // $selected_team = $_POST['selected_team'];
-    $member_email = $_POST['member'];
 
 
-    $email_array = get_post_meta($post_id, 'member_array', true);
 
-    if (in_array($member_email, $email_array)) {
-        wp_send_json_error(['message' => 'Member Already exists']);
-        wp_die();
-    }
-    $email_array[] = $member_email; // Step 3: Push new email
 
-    // Step 4: Save back
-    
-
-/*     $email_array = get_post_meta($post_id, 'member_array', true);
-
-    $email_array = array_push($email_array,$member_email);  */
    
      update_post_meta($post_id, 'details', $project_details);
      update_post_meta($post_id, 'due_date', $due_date);
      update_post_meta($post_id, 'priority', $priority);
      update_post_meta($post_id, 'status', $status);
-     update_post_meta($post_id, 'member_array', $email_array);
 
     wp_send_json_success([
         'message' => $post_id
@@ -478,4 +463,20 @@ function handle_invitation_token() {
     }
 
 }
+
 add_action( 'template_redirect', 'handle_invitation_token' );
+
+
+
+/* 
+$member_email = $_POST['member'];
+
+
+$email_array = get_post_meta($post_id, 'member_array', true);
+
+if (in_array($member_email, $email_array)) {
+    wp_send_json_error(['message' => 'Member Already exists']);
+    wp_die();
+}
+$email_array[] = $member_email; 
+update_post_meta($post_id, 'member_array', $email_array); */

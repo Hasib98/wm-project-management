@@ -3,39 +3,97 @@
 
 
 #wmpm_app{
-    background: rgb(184, 160, 160);
     height: 100vh;
+    padding: 20px;
 }
+
 #wmpm_app .container {
 
 }
-
 
 
 #wmpm_app .container button {
     border: none;
     background: black;
     color: white;
-    border-radius: 15px;
-    padding: 8px 20px;
+    border-radius: 8px;
+    padding: 12px 20px;
+    margin-block: 4px;  
+    
 }
-
-#wmpm_app .container input {
-  /* border: none; */
+#wmpm_app .container button:hover {
+   
+    background: #333;
+    cursor: pointer;
+    
 }
-
 
 #wmpm_app .container input:focus {
     outline: none;
 }
 
-/* Solid border */
-#wmpm_app .container hr.solid {
-    border-top: 3px solid #030000;
-    z-index: 9999;
-}
-
 #wmpm_app .container .container:nth-child(2) form {
     display: flex;
     flex-direction: column;
+}
+
+#wmpm_app input, #wmpm_app select, #wmpm_app textarea {
+    padding: 10px;
+    margin-inline: 6px;
+    border-radius: 6px;
+    background: transparent;
+    box-shadow: 0 0 5px rgba(0,0,0,0.2);
+
+}
+
+
+body {
+    width: 100%;
+    max-width: 1080px;
+    margin-inline: auto;
+    margin-block: 10px;
+    font-family: Verdana, Geneva, Tahoma, sans-serif
+}
+
+form#project_details_form {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: repeat(auto-fit, 400px);
+}
+
+form#project_details_form button[type=submit]{
+    grid-column: 1/2;
+}
+
+h1 {
+    font-size: 20px;
+    font-weight: 500;
+}
+
+
+#wmpm_app ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 400px;
+}
+#wmpm_app ul li {
+    padding: 10px;
+    color: white;
+    border-radius: 8px;
+    margin-block: 4px;
+    box-shadow: 0 0 5px rgba(0,0,0,0.2);
+    transition: all 0.2s ease-in-out;
+}
+#wmpm_app ul li:hover {
+    background: #333;
+    cursor: pointer;
+}
+#wmpm_app ul li a{
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+}
+#wmpm_app ul li:hover  a{
+    color: white;
 }

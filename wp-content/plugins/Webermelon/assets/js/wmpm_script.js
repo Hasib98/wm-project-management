@@ -34,6 +34,8 @@ createProjectBtn.addEventListener("click", function () {
 
       if (data.success) {
         console.log("Server Response:", data);
+        alert(data.data.message);
+        location.reload();
       } else {
         alert(data.data.message);
       }
@@ -53,6 +55,9 @@ createTeamBtn.addEventListener("click", function () {
   let addTeamBtn = document.getElementById("add_team_btn");
 
   if (!teamNameInput && !addTeamBtn) {
+
+    label = document.createElement("div");
+    label.textContent = "Please Input Team Name:";
     teamNameInput = document.createElement("input");
     teamNameInput.id = "team_input";
 
@@ -61,6 +66,7 @@ createTeamBtn.addEventListener("click", function () {
     addTeamBtn.appendChild(document.createTextNode("Add Team"));
 
     const teamList = document.querySelector(".team_list");
+    teamList.appendChild(label);
     teamList.appendChild(teamNameInput);
     teamList.appendChild(addTeamBtn);
   }
@@ -81,6 +87,8 @@ createTeamBtn.addEventListener("click", function () {
       if (data.success) {
         console.log("Server Response:", data);
         alert(data.data.message);
+        location.reload();
+  
       } else {
         alert(data.message);
       }
@@ -113,7 +121,9 @@ teamMemberForm.addEventListener("submit", async function (e) {
 
     if (data.success) {
       console.log("Server Response:", data);
-      alert(data.data.message);
+      alert("Invite Senrt Successfully!");
+      location.reload();
+  
     } else {
       console.log(data.data.message);
       alert(data.data.message);
@@ -131,6 +141,10 @@ const selectedTeam = document.getElementById("selected_team");
 if (selectedTeam) {
   selectedTeam.addEventListener("change", async function () {
     // alert("test");
+
+    if(this.value == "Select From Team"){ 
+      alert(this.value);
+    }
     const team_id = this.value;
 
     const formData = new FormData();
@@ -146,7 +160,7 @@ if (selectedTeam) {
       const data = await response.json();
 
       if (data.success) {
-        // console.log("Server Response:", data);
+        console.log("Server Response:", data);
         // alert(data.data.message);
         const selectElement = document.getElementById("member");
 
@@ -183,8 +197,7 @@ updateProject.addEventListener("submit", async function (e) {
   const due_date = document.getElementById("due_date").value;
   const priority = document.getElementById("priority").value;
   const status = document.getElementById("status").value;
-  // const selected_team = document.getElementById('selected_team').value;
-  const member = document.getElementById("member").value;
+
 
   const formData = new FormData();
   formData.append("project_id", project_id);
@@ -192,9 +205,7 @@ updateProject.addEventListener("submit", async function (e) {
   formData.append("due_date", due_date);
   formData.append("priority", priority);
   formData.append("status", status);
-  // formData.append("selected_team", selected_team);
-  formData.append("member", member);
-  console.log(member);
+
 
   formData.append("action", "update_project");
 
@@ -216,3 +227,35 @@ updateProject.addEventListener("submit", async function (e) {
     alert("An error occurred. Please try again.");
   }
 });
+
+
+const addMemberToProject = document.getElementById("add_member_to_project_form");
+ addMemberToProject.addEventListener("submit", async function (e) {
+  e.preventDefault();
+
+  const project_id = document.getElementById("project").value;
+  const member = document.getElementById("member").value;
+
+  const formData = new FormData();
+  formData.append("project_id", project_id);
+  formData.append("member", member);
+  formData.append("action", "add_member_to_project");
+
+  try {
+    const response = await fetch(ajax_object.ajax_url, {
+      method: "POST",
+      body: formData,
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      console.log("Server Response:", data);
+    } else {
+      console.log(data.data.message);
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    alert("An error occurred. Please try again.");
+  }
+} );
