@@ -31,7 +31,7 @@ function wmpm_enqueue_scripts() {
             'wmpm_script',
             plugin_dir_url(__FILE__) . 'assets/js/wmpm_script.js',
             array('jquery'),
-            null,
+            filemtime(plugin_dir_path(__FILE__) . 'assets/js/wmpm_script.js'),
             true
         );
         
@@ -46,7 +46,7 @@ add_action('wp_enqueue_scripts', 'wmpm_enqueue_scripts', 9999);
 // Shortcode output
 function my_html_page_shortcode() {
     ob_start();
-    include plugin_dir_path(__FILE__) . 'homepage-copy.php';
+    include plugin_dir_path(__FILE__) . 'homepage.php';
     return ob_get_clean();
 }
 add_shortcode('project_manage_page', 'my_html_page_shortcode');
@@ -462,7 +462,7 @@ function handle_invitation_token() {
        
     }
 
-}
+}   
 
 add_action( 'template_redirect', 'handle_invitation_token' );
 
@@ -480,3 +480,60 @@ if (in_array($member_email, $email_array)) {
 }
 $email_array[] = $member_email; 
 update_post_meta($post_id, 'member_array', $email_array); */
+
+
+function link_redirect_to_project_page() {
+	printf('<a id="link" href="%s" target="_blank">Click here to view your project</a>', esc_url( home_url( 'project-manage-page' ) ));
+}
+
+// Now we set that function up to execute when the admin_notices action is called.
+add_action( 'admin_notices', 'link_redirect_to_project_page' );
+
+
+function dolly_css() {
+	echo "
+	<style type='text/css'>
+    #link {
+        float: right;
+        padding: 5px 10px;
+        margin: 0;
+        font-size: 12px;
+        line-height: 1.6666;
+        background-color:#08b8a3;
+        border: 1px solid #ccc; 
+        border-radius: 8px;
+        text-decoration: none;  
+        color: #fff;
+        font-weight: bold;
+        transition: background-color 0.3s, color 0.3s;
+    }
+
+    #link:hover {
+        background-color: #fff;
+        color: #08b8a3;
+        border: 1px solid #08b8a3; 
+    }
+    .block-editor-page #link {
+        display: none;
+    }
+    .editor-styles-wrapper #link {
+        display: block;
+    }
+    .editor-styles-wrapper #link:hover {
+        background-color: #fff;
+        color: #08b8a3;
+        border: 1px solid #08b8a3; 
+    }
+    .editor-styles-wrapper #link {
+        display: block;
+    }
+    .editor-styles-wrapper #link:hover {
+        background-color: #fff;
+        color: #08b8a3;
+        border: 1px solid #08b8a3; 
+    }
+	</style>
+	";
+}
+
+add_action( 'admin_head', 'dolly_css' );

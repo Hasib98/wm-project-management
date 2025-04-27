@@ -1,5 +1,11 @@
+<?php
+/**
+ * Template Part: Create Team Form
+ * Displayed only for administrators and editors
+ */
+?>
+
 <div class="container">
-  
     <div>
         <h1>Create Team</h1>
         <button class="create_team_btn">+</button>
@@ -18,13 +24,10 @@
                 );
 
                 $team_query = new WP_Query($args);
-        
                 
                 if ($team_query->have_posts()) : ?>
             <select name="teams" id="teams">
-                
                 <?php
-                       
                         while ($team_query->have_posts()) : $team_query->the_post();
                             
                             $post_id = get_the_ID();
@@ -44,5 +47,4 @@
         </form>
     </div>
 </div>
-
 

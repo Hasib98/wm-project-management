@@ -10,12 +10,9 @@ defined('ABSPATH') || exit;
     <?php wp_head() ?>
 </head>
 <body>
-<div id="wmpm_app">
-    <!-- plugin UI -->
     <?php echo do_shortcode('[project_manage_page]'); ?>
-</div>
-
-        <?php wp_footer(); ?>
+    <?php wp_footer(); ?>
+    
 </body>
 
 </html>
