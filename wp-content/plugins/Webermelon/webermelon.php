@@ -227,43 +227,6 @@ function create_team_post()
 add_action('wp_ajax_create_team', 'create_team_post');
 
 
-/**
- * add  email of member
- */
-function add_team_member()
-{
-
-    if (!isset($_POST['action']) || $_POST['action'] !== 'add_team_member') {
-        wp_send_json_error(['message' => 'Invalid request.']);
-        wp_die();
-    }
-
-    $post_id = sanitize_text_field($_POST['team_id']);
-    $email = sanitize_email($_POST['email']);
-
-    $email_array = get_post_meta($post_id, 'member_email_array', true);
-
-    if (in_array($email, $email_array)) {
-        wp_send_json_error(['message' => 'User Already exists']);
-        wp_die();
-    }
-
-    $email_array[] = $email; // Step 3: Push new email
-
-    // Step 4: Save back
-    update_post_meta($post_id, 'member_email_array', $email_array);
-
-
-    wp_send_json_success(['message' => $email . ' added']);
-    wp_die();
-}
-
-// Call this function whenever you want to create a team post
-
-add_action('wp_ajax_add_team_member', 'add_team_member');
-
-
-
 
 
 
@@ -337,6 +300,7 @@ function get_team_member(){
         wp_die();
     }
 
+
     $post_id = sanitize_text_field($_POST['team_id']);
 
     $email_array = get_post_meta($post_id, 'member_email_array', true);
@@ -355,22 +319,18 @@ add_action('wp_ajax_get_team_member', 'get_team_member');
 
 function update_project()
 {
-
     if (!isset($_POST['action']) || $_POST['action'] !== 'update_project') {
         wp_send_json_error(['message' => 'Invalid request.']);
         wp_die();
     }
-
+    
 
     $post_id = intval(sanitize_text_field($_POST['project_id']));
     $project_details = sanitize_textarea_field($_POST['projectd_details']);
     $due_date = $_POST['due_date'];
     $priority = $_POST['priority'];
     $status = $_POST['status'];
-
-
-
-
+    
    
      update_post_meta($post_id, 'details', $project_details);
      update_post_meta($post_id, 'due_date', $due_date);
@@ -393,10 +353,9 @@ function send_invite()
         wp_die();
     }
 
-    $email = sanitize_email($_POST['email']);
+    $email = sanitize_email($_POST['recipient_email']);
     $team_id = sanitize_text_field($_POST['team_id']);
     $team_name = get_the_title($team_id);
-
 
     if(email_exists($email)) {
         wp_send_json_error(['message' => 'User already exists.']);
@@ -405,19 +364,25 @@ function send_invite()
     $token = generateRandomString(10);
     $site_url = get_site_url();
 
-    $message = "You have been invited to join  $team_name. Click the link to accept: $site_url/invitation?token=$token";
+    $message = "You have been invited to join  $team_name. Click the link to accept: $site_url/invitation?id=$team_id&token=$token";
 
     // Send email
     $headers = array('Content-Type: text/plain; charset=UTF-8');    
 
-    $user_id = get_current_user_id();
-    update_user_meta( $user_id, 'temp_token', $token );
-    update_user_meta( $user_id, 'temp_email', $email );
+    $temp_invite_data[] = array( $token, $email);
 
-    wp_mail($email, "Invitation to join $team_name", $message, $headers, "");
+    update_post_meta($team_id, 'temp_invite_data', $temp_invite_data );
+    if (!wp_next_scheduled('delete_temp_invite_data_event', array($team_id))) {
+        wp_schedule_single_event(time() + 300, 'delete_temp_invite_data_event', array($team_id)); // 300 seconds = 5 minutes
+    }
+    
+    // Hook to handle the deletion
+   
+
+    // wp_mail($email, "Invitation to join $team_name", $message, $headers, "");
 
     wp_send_json_success([
-        'message' => "Link: $site_url/invitation?token=$token\n"
+        'message' => "Link: $site_url/invitation?id=$team_id&token=$token\n"
     ]);
     wp_die();
 }
@@ -425,23 +390,37 @@ function send_invite()
 add_action('wp_ajax_send_invite', 'send_invite');
 add_action('wp_ajax_nopriv_send_invite', 'send_invite');
 
+add_action('delete_temp_invite_data_event', function($team_id) {
+    delete_post_meta($team_id, 'temp_invite_data');
+});
+
 
 function handle_invitation_token() {
     // Check if we're on the 'invitation' page and the token is in the URL
-    if (isset( $_GET['token'] ) ) {
+    if (isset( $_GET['token'] ) && isset($_GET['id'])) {
         $token = isset($_GET['token']) ? sanitize_text_field($_GET['token']) : '';
+        $team_id = isset($_GET['id']) ? sanitize_text_field($_GET['id']) : '';
 
-        if ($token !== get_user_meta( get_current_user_id(), 'temp_token', true )) {
-            echo "Token is not valid.";
+        $temp_invite_data = get_post_meta($team_id, 'temp_invite_data', true);
+        if (!is_array($temp_invite_data)) {
+            // Handle error: no temp invite data found
+            error_log('No temp invite data found for team ID: ' . $team_id);
             return;
         }
-        delete_user_meta( get_current_user_id(), 'temp_token' );
-        
-        $email = get_user_meta( get_current_user_id(), 'temp_email', true );
-        delete_user_meta( get_current_user_id(), 'temp_email' );    
+        foreach ($temp_invite_data as $data) {
+            if ($data[0] === $token) {
+                $email = $data[1];
+                break;
+            }
+            $email= null;
 
+        }
+        
+
+        // $username = strstr($email, '@', true);
+        // $password = mt_rand(10000, 99999);
         $username = strstr($email, '@', true);
-        $password = mt_rand(10000, 99999);
+        $password = 9999;
         $user_id = wp_create_user($username, $password, $email);
         if (is_wp_error($user_id)) {
             // Handle error
@@ -454,18 +433,58 @@ function handle_invitation_token() {
         $message .= "You can now log in to your account.\n\n";
         $message .= "Webermelon";
         $headers = array('Content-Type: text/plain; charset=UTF-8');    
-        wp_mail($email, "Invitation to join a team", $message, $headers, "");
+        // wp_mail($email, "Invitation to join a team", $message, $headers, "");
         echo "Token received: " . $token;
+
+        $email_array = get_post_meta($team_id, 'member_email_array', true);
+        if (!is_array($email_array)) {
+            $email_array = array();
+        }
+        $email_array[] = $email; // Add the new email to the array
+        update_post_meta($team_id, 'member_email_array', $email_array); // Save the updated array
 
         wp_redirect(wp_login_url());
         exit;
-       
     }
 
 }   
 
 add_action( 'template_redirect', 'handle_invitation_token' );
 
+
+/**
+ * add  email of member
+ */
+function add_team_member(){
+
+    if (!isset($_POST['action']) || $_POST['action'] !== 'add_team_member') {
+        wp_send_json_error(['message' => 'Invalid request.']);
+        wp_die();
+    }
+
+    $post_id = sanitize_text_field($_POST['team_id']);
+    $email = sanitize_email($_POST['email']);
+
+    $email_array = get_post_meta($post_id, 'member_email_array', true);
+
+    if (in_array($email, $email_array)) {
+        wp_send_json_error(['message' => 'User Already exists']);
+        wp_die();
+    }
+
+    $email_array[] = $email; // Step 3: Push new email
+
+    // Step 4: Save back
+    update_post_meta($post_id, 'member_email_array', $email_array);
+
+
+    wp_send_json_success(['message' => $email . ' added']);
+    wp_die();
+}
+
+// Call this function whenever you want to create a team post
+
+add_action('wp_ajax_add_team_member', 'add_team_member');
 
 
 /* 
@@ -479,7 +498,8 @@ if (in_array($member_email, $email_array)) {
     wp_die();
 }
 $email_array[] = $member_email; 
-update_post_meta($post_id, 'member_array', $email_array); */
+update_post_meta($post_id, 'member_array', $email_array); 
+*/
 
 
 function link_redirect_to_project_page() {
@@ -490,7 +510,7 @@ function link_redirect_to_project_page() {
 add_action( 'admin_notices', 'link_redirect_to_project_page' );
 
 
-function dolly_css() {
+function admin_dashboard_btn() {
 	echo "
 	<style type='text/css'>
     #link {
@@ -536,4 +556,27 @@ function dolly_css() {
 	";
 }
 
-add_action( 'admin_head', 'dolly_css' );
+add_action( 'admin_head', 'admin_dashboard_btn' );
+
+
+
+function get_team_member_email(){
+
+    if (!isset($_POST['action']) || $_POST['action'] !== 'get_team_member_email') {
+        wp_send_json_error(['message' => 'Invalid request.']);
+        wp_die();
+    }
+
+
+    $post_id = sanitize_text_field($_POST['team_id']);
+
+    $email_array = get_post_meta($post_id, 'member_email_array', true);
+
+    wp_send_json_success([
+        'message' => $email_array
+    ]);
+    wp_die();
+}   
+
+add_action('wp_ajax_get_team_member_email', 'get_team_member_email');
+// add_action('wp_ajax_nopriv_get_team_member_email', 'get_team_member_email');

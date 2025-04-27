@@ -1,4 +1,3 @@
-
 /* ======================create Project =========================*/
 
 const createProjectBtn = document.querySelector(".create_project_btn");
@@ -124,13 +123,9 @@ teamMemberForm.addEventListener("submit", async function (e) {
   }
 });
 
-// avatar link https://i.pravatar.cc/48
-
 const selectedTeam = document.getElementById("selected_team");
 
-selectedTeam.addEventListener("change", async function () { 
-
-
+selectedTeam.addEventListener("change", async function () {
   // alert("test");
   const team_id = this.value;
 
@@ -151,12 +146,9 @@ selectedTeam.addEventListener("change", async function () {
       // alert(data.data.message);
       const selectElement = document.getElementById("member");
 
-      
-
-
       // Clear existing options
       selectElement.innerHTML = "";
-      const emails =  data.data.message
+      const emails = data.data.message;
 
       // Add new options from the array
       emails.forEach((email) => {
@@ -176,19 +168,18 @@ selectedTeam.addEventListener("change", async function () {
   }
 });
 
-const  updateProject = document.getElementById('project_details_form');
+const updateProject = document.getElementById("project_details_form");
 
- updateProject.addEventListener('submit' ,  async function(e){
+updateProject.addEventListener("submit", async function (e) {
   e.preventDefault();
 
-  const project_id = document.getElementById('project').value;
-  const projectd_details = document.getElementById('projectd_details').value;
-  const due_date = document.getElementById('due_date').value;
-  const priority = document.getElementById('priority').value;
-  const status = document.getElementById('status').value;
+  const project_id = document.getElementById("project").value;
+  const projectd_details = document.getElementById("projectd_details").value;
+  const due_date = document.getElementById("due_date").value;
+  const priority = document.getElementById("priority").value;
+  const status = document.getElementById("status").value;
   // const selected_team = document.getElementById('selected_team').value;
-  const member = document.getElementById('member').value;
-
+  const member = document.getElementById("member").value;
 
   const formData = new FormData();
   formData.append("project_id", project_id);
@@ -219,6 +210,4 @@ const  updateProject = document.getElementById('project_details_form');
     console.error("Error:", error);
     alert("An error occurred. Please try again.");
   }
-
-
- })
+});

@@ -1,6 +1,7 @@
 <header>
     <div class="toggle_left_bar_burger_button_container">
-        <img src="<?php echo plugin_dir_url(__FILE__).'/assets/images/burger-menu-left-svgrepo-com.svg'; ?>" alt="Toggle Icon">
+        <img src="<?php echo plugin_dir_url(__FILE__).'/assets/images/burger-menu-left-svgrepo-com.svg'; ?>"
+            alt="Toggle Icon">
     </div>
     <div class="logo_container">
         <a href="<?php echo esc_url(home_url('project-manage-page')); ?>" class="logo">
@@ -17,12 +18,12 @@
             <button class="toggle_team_button">+</button>
         </div>
         <form class="create_team_form">
-            <input name="team_name" type="text" placeholder="Create a new team" class="create_team_input" required> 
-                
+            <input name="team_name" type="text" placeholder="Create a new team" class="create_team_input" required>
+
         </form>
 
         <ul class="team_list">
-        <?php
+            <?php
                 // Custom query to get team posts
                 $args = array(
                     'post_type' => 'team',
@@ -36,37 +37,62 @@
 
                 // Check if we have posts
                 if ($team_query->have_posts()) : ?>
-                
-                    <?php
+
+            <?php
                         // Start the loop
                         while ($team_query->have_posts()) : $team_query->the_post();
                             // Get the post ID
                             $post_id = get_the_ID();
                         ?>
-                    <li class="single_team_list" value="<?php echo $post_id; ?>"><?php the_title(); ?></></li>
-                    <?php endwhile; ?>
-                    <?php
+            <li class="single_team_list" value="<?php echo $post_id; ?>"><?php the_title(); ?></>
+            </li>
+            <?php endwhile; ?>
+            <?php
                     // Reset post data
                     wp_reset_postdata();
 
                 else : ?>
-                    <p>No teams found.</p>
-                    <?php endif; ?>
+            <p>No teams found.</p>
+            <?php endif; ?>
         </ul>
     </div>
-   
+
+    <div class="project">
+        <div class="project_name_container">
+            <h3>Projects</h3>
+            <button class="toggle_project_button">+</button>
+        </div>
+        <form class="create_project_form">
+            <input name="project_name" type="text" placeholder="Create a new project" class="create_project_input"
+                required>
+
+        </form>
+
+        <ul class="project_list">
+            <li>Project 1</li>
+            <li>Project 2</li>
+            <li>Project 3</li>
+            <li>Project 4</li>
+        </ul>
+    </div>
 </div>
 
 
-<div class="team_modal open">
+<div class="team_modal">
     <div class="team_modal_content">
         <span class="close_team_modal">&times;</span>
         <h2><span id="team_name"></span> Members</h2>
         <form id="invite_member_form">
             <input name="recipient_email" type="email" placeholder="Add Team Member by Email" required>
         </form>
+        <ul class="team_member_list">
+            <li><img src="https://i.pravatar.cc/24" alt="">test@testmail.com</li>
+            <li><img src="https://i.pravatar.cc/24" alt="">test@testmail.com</li>
+            <li><img src="https://i.pravatar.cc/24" alt="">test@testmail.com</li>
+            <li><img src="https://i.pravatar.cc/24" alt="">test@testmail.com</li>
+        </ul>
 
-     </div>
+    </div>
 </div>
 
 
