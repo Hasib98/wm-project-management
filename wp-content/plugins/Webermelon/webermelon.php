@@ -240,12 +240,10 @@ add_action('wp_ajax_create_team', 'create_team_post');
 
 function create_project_post()
 {
-
     if (!isset($_POST['action']) || $_POST['action'] !== 'create_project') {
         wp_send_json_error(['message' => 'Invalid request.']);
         wp_die();
     }
-
 
     $project_name = sanitize_text_field($_POST['project_name']);
 
@@ -263,7 +261,6 @@ function create_project_post()
         'post_author'   => 1,                 // Default admin user ID
     );
 
-
     // Insert the post into the database
     $post_id = wp_insert_post($project_post);
 
@@ -275,18 +272,53 @@ function create_project_post()
     }
 
     //create post meta with empty array
-    // update_post_meta($post_id, 'member_array', []);
-    // update_post_meta($post_id, 'details', '');
-    // update_post_meta($post_id, 'due_date', '');
-    // update_post_meta($post_id, 'priority_array', ['low','medium','high']);
-    // update_post_meta($post_id, 'status', ['started','In progress','Done']);
+    update_post_meta($post_id, 'details', 'details');
+    update_post_meta($post_id, 'due_date', '2018-07-22');
+    update_post_meta($post_id, 'priority', 'low');
+    update_post_meta($post_id, 'status', 'on-hold');
+    
     update_post_meta($post_id, 'member_array', []);
+
     wp_send_json_success([
+        'message' => $post_id." ".get_the_title( $post_id )
+    ]);
+    wp_die();
+}
+
+
+function update_project()
+{
+    if (!isset($_POST['action']) || $_POST['action'] !== 'update_project') {
+        wp_send_json_error(['message' => 'Invalid request.']);
+        wp_die();
+    }   
+    
+
+    $post_id = intval(sanitize_text_field($_POST['project_id']));
+    $project_name = sanitize_text_field($_POST['project_name']);
+    $project_details = sanitize_textarea_field($_POST['project_description']);
+    $due_date = $_POST['project_due_date'];
+    $priority = $_POST['project_priority'];
+    $status = $_POST['project_status'];
+    
+
+    wp_update_post( array(
+        'ID' => $post_id,
+        'post_title' => $project_name,
+    ) );
+   
+     update_post_meta($post_id, 'details', $project_details);
+     update_post_meta($post_id, 'due_date', $due_date);
+     update_post_meta($post_id, 'priority', $priority);
+     update_post_meta($post_id, 'status', $status);
+
+    wp_send_json_success([  
         'message' => $post_id
     ]);
     wp_die();
 }
 
+add_action('wp_ajax_update_project', 'update_project'); 
 
 
 // Call this function whenever you want to create a project post
@@ -317,33 +349,6 @@ add_action('wp_ajax_get_team_member', 'get_team_member');
 
 
 
-function update_project()
-{
-    if (!isset($_POST['action']) || $_POST['action'] !== 'update_project') {
-        wp_send_json_error(['message' => 'Invalid request.']);
-        wp_die();
-    }
-    
-
-    $post_id = intval(sanitize_text_field($_POST['project_id']));
-    $project_details = sanitize_textarea_field($_POST['projectd_details']);
-    $due_date = $_POST['due_date'];
-    $priority = $_POST['priority'];
-    $status = $_POST['status'];
-    
-   
-     update_post_meta($post_id, 'details', $project_details);
-     update_post_meta($post_id, 'due_date', $due_date);
-     update_post_meta($post_id, 'priority', $priority);
-     update_post_meta($post_id, 'status', $status);
-
-    wp_send_json_success([
-        'message' => $post_id
-    ]);
-    wp_die();
-}
-
-add_action('wp_ajax_update_project', 'update_project'); 
 
 
 function send_invite()
@@ -379,7 +384,7 @@ function send_invite()
     // Hook to handle the deletion
    
 
-    // wp_mail($email, "Invitation to join $team_name", $message, $headers, "");
+    wp_mail($email, "Invitation to join $team_name", $message, $headers, "");
 
     wp_send_json_success([
         'message' => "Link: $site_url/invitation?id=$team_id&token=$token\n"
@@ -433,7 +438,7 @@ function handle_invitation_token() {
         $message .= "You can now log in to your account.\n\n";
         $message .= "Webermelon";
         $headers = array('Content-Type: text/plain; charset=UTF-8');    
-        // wp_mail($email, "Invitation to join a team", $message, $headers, "");
+        wp_mail($email, "Invitation to join a team", $message, $headers, "");
         echo "Token received: " . $token;
 
         $email_array = get_post_meta($team_id, 'member_email_array', true);
@@ -575,8 +580,78 @@ function get_team_member_email(){
     wp_send_json_success([
         'message' => $email_array
     ]);
-    wp_die();
+    wp_die();   
 }   
 
 add_action('wp_ajax_get_team_member_email', 'get_team_member_email');
 // add_action('wp_ajax_nopriv_get_team_member_email', 'get_team_member_email');
+
+
+function get_project_details(){
+
+    if (!isset($_POST['action']) || $_POST['action'] !== 'get_project_details') {
+        wp_send_json_error(['message' => 'Invalid request.']);
+        wp_die();
+    }
+
+
+    $post_id = sanitize_text_field($_POST['project_id']);
+        
+
+    $details = get_post_meta($post_id, 'details', true);
+    $due_date = get_post_meta($post_id, 'due_date', true);
+    $priority = get_post_meta($post_id, 'priority', true);
+    $status = get_post_meta($post_id, 'status', true);
+    $project_name = get_the_title($post_id);
+    $email_array = get_post_meta($post_id, 'member_array', true);
+    if (!is_array($email_array)) {
+        $email_array = array();
+    }
+
+
+    wp_send_json_success([
+        'message' => [
+            'project_name' => $project_name,
+            'details' => $details,
+            'due_date' => $due_date,
+            'priority' => $priority,
+            'status' => $status,
+            'members' => $email_array
+        ]
+    ]);
+    wp_die();
+}
+
+add_action('wp_ajax_get_project_details', 'get_project_details');
+add_action('wp_ajax_nopriv_get_project_details', 'get_project_details');
+
+
+function add_member_to_project(){
+
+    if (!isset($_POST['action']) || $_POST['action'] !== 'add_member_to_project') {
+        wp_send_json_error(['message' => 'Invalid request.']);
+        wp_die();
+    }
+
+
+    $post_id = sanitize_text_field($_POST['project_id']);
+    $email = sanitize_email($_POST['team_member_email']);
+
+    $email_array = get_post_meta($post_id, 'member_array', true);
+
+    if (in_array($email, $email_array)) {
+        wp_send_json_error(['message' => 'User Already exists']);
+        wp_die();
+    }
+
+    $email_array[] = $email; // Step 3: Push new email
+
+    // Step 4: Save back
+    update_post_meta($post_id, 'member_array', $email_array);
+
+
+    wp_send_json_success(['message' => $email_array]);
+    wp_die();
+}
+
+add_action('wp_ajax_add_member_to_project', 'add_member_to_project');

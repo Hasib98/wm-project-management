@@ -20,37 +20,37 @@
             <br>
             <form id="team_member_form">
                 <input id="add_team_member_field" type="email">
-                <?php
-                // Custom query to get team posts
-                $args = array(
-                    'post_type' => 'team',
-                    'posts_per_page' => -1, // Get all posts. You can limit this if needed
-                    'post_status' => 'publish',
-                    'orderby' => 'title',
-                    'order' => 'ASC'
-                );
-
-                $team_query = new WP_Query($args);
-
-                // Check if we have posts
-                if ($team_query->have_posts()) : ?>
-                <select name="teams" id="teams">
                     <?php
-                        // Start the loop
-                        while ($team_query->have_posts()) : $team_query->the_post();
-                            // Get the post ID
-                            $post_id = get_the_ID();
-                        ?>
-                    <option value="<?php echo $post_id; ?>"><?php the_title(); ?></option>
-                    <?php endwhile; ?>
-                    <?php
-                    // Reset post data
-                    wp_reset_postdata();
+                    // Custom query to get team posts
+                    $args = array(
+                        'post_type' => 'team',
+                        'posts_per_page' => -1, // Get all posts. You can limit this if needed
+                        'post_status' => 'publish',
+                        'orderby' => 'title',
+                        'order' => 'ASC'
+                    );
 
-                else : ?>
-                    <p>No teams found.</p>
-                    <?php endif; ?>
-                </select>
+                    $team_query = new WP_Query($args);
+
+                    // Check if we have posts
+                    if ($team_query->have_posts()) : ?>
+                    <select name="teams" id="teams">
+                        <?php
+                            // Start the loop
+                            while ($team_query->have_posts()) : $team_query->the_post();
+                                // Get the post ID
+                                $post_id = get_the_ID();
+                            ?>
+                        <option value="<?php echo $post_id; ?>"><?php the_title(); ?></option>
+                        <?php endwhile; ?>
+                        <?php
+                        // Reset post data
+                        wp_reset_postdata();
+
+                    else : ?>
+                        <p>No teams found.</p>
+                        <?php endif; ?>
+                    </select>
                 <button id="add_team_member_btn" type="submit">Add Memmber</button>
             </form>
         </div>
