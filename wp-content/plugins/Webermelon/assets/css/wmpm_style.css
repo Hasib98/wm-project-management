@@ -244,6 +244,25 @@ ul.project_list li:hover {
     text-transform: capitalize;
 }
 
+
+.team_modal button.delete_team_btn{
+    background: #363636;
+    border: none;
+    border-radius: 6px;
+    padding: 8px;
+    color: white;
+    cursor: pointer;
+}
+
+
+.team_modal button.delete_team_btn:hover{
+ 
+    background: #9c9c9c;
+    color: #f8f8f8;
+    transition: background 0.3s ease-in-out;
+}
+
+
 .team_modal.open {
     display: block;
 }
@@ -296,6 +315,22 @@ ul.project_list li:hover {
 
 }
 
+.team_modal ul li button.delete_member_button {
+    background-color: #3b3a3a;
+    padding: 5px 10px;
+    border-radius: 50%;
+    color: #f8f8f8;
+    margin-left: 10px;
+    cursor: pointer;
+    font-size: 16px;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: absolute;
+    right: 30px;   
+}
+
+
+
 .team_modal ul li img {
     height: 24px;
     width: 24px;
@@ -336,6 +371,49 @@ ul.project_list li:hover {
     color: #f8f8f8;
 }
 
+
+.right_sidebar .right_sidebar_content .project_description {
+    background-color: #202020;
+    padding: 10px;
+    border-radius: 5px;
+    color: #cecece;
+    margin-bottom: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 100%;
+}
+.right_sidebar .right_sidebar_content  .data_container{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #242424;
+    padding: 5px;
+    border-radius: 5px;
+    color: #f8f8f8;
+    font-size: 16px;
+    /* font-weight: 500; */
+}
+.right_sidebar .right_sidebar_content .data_container label{
+    font-size: 16px;
+    font-weight: 500;
+    color: #f8f8f8;
+    margin-right: 10px;
+    text-transform: capitalize;
+    width: 100px;
+}
+.right_sidebar .right_sidebar_content .data_container .project_due_date,
+.right_sidebar .right_sidebar_content .data_container .project_priority,
+.right_sidebar .right_sidebar_content .data_container .project_status{
+    /* background-color: #202020; */
+    padding: 10px;
+    border-radius: 5px;
+    color: #cecece;
+
+    cursor: pointer;
+    font-size: 16px;
+    width: 100%;
+}
+
 .right_sidebar.open {
     /* display: block; */
     right: 0;
@@ -362,6 +440,33 @@ ul.project_list li:hover {
     text-align: center;
 }
 
+.right_sidebar button.delete_project_btn {
+    background-color: #363636;
+    padding: 10px 20px;
+    border-radius: 5px;
+    color: #f8f8f8;
+    margin-bottom: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: absolute;
+    top: 138px;
+    right: 10px;
+}
+.right_sidebar button.delete_project_btn:hover {
+    background-color: #9b9b9b;
+    /* Darker shade on hover */
+    color: #f8f8f8;
+    /* Change text color on hover */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    /* Add shadow on hover */
+    transform: translateY(-1px);
+    /* Slight lift effect on hover */
+    transition: all 0.2s ease-in-out;
+    /* Smooth transition for all properties */
+}
+
 .right_sidebar .close_right_sidebar:hover {
     /* Darker shade on hover */
     color: #fff;
@@ -372,7 +477,7 @@ ul.project_list li:hover {
 }
 
 button.edit_project_btn {
-    background-color: #4b4b4b;
+    background-color: #363636;
     padding: 10px 20px;
     border-radius: 5px;
     color: #f8f8f8;
@@ -431,6 +536,20 @@ ul.project_member_list li {
     margin-bottom: 5px;
     cursor: pointer;
     font-size: 16px;
+}
+
+ul.project_member_list li button.delete__project_member_button {
+    background-color: #3b3a3a;
+    padding: 5px 10px;
+    border-radius: 50%;
+    color: #f8f8f8;
+    margin-left: 10px;
+    cursor: pointer;
+    font-size: 16px;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: absolute;
+    right: 340px;   
 }
 
 

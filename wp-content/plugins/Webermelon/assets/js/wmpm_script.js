@@ -16,38 +16,42 @@ document
   });
 
 const createTeamForm = document.querySelector(".create_team_form");
-document
-  .querySelector(".toggle_team_button")
-  .addEventListener("click", function () {
+const toggleTeamButton = document.querySelector(".toggle_team_button");
+
+if(toggleTeamButton) {
+  toggleTeamButton.addEventListener("click", function () {
     createTeamForm.classList.toggle("open");
   });
 
-createTeamForm.addEventListener("submit", async function (event) {
-  event.preventDefault(); // Prevent the default form submission
-  const formData = new FormData(createTeamForm);
-  const teamName = formData.get("team_name");
-  formData.append("action", "create_team");
-
-  try {
-    const response = await fetch(ajax_object.ajax_url, {
-      method: "POST",
-      body: formData,
-    });
-
-    const data = await response.json();
-
-    if (data.success) {
-      console.log("Server Response:", data);
-      // alert(data.data.message);
-      window.location.reload(); // Reload the page to see the new team
-    } else {
-      alert(data.message);
+}
+if(createTeamForm){
+  createTeamForm.addEventListener("submit", async function (event) {
+    event.preventDefault(); // Prevent the default form submission
+    const formData = new FormData(createTeamForm);
+    const teamName = formData.get("team_name");
+    formData.append("action", "create_team");
+  
+    try {
+      const response = await fetch(ajax_object.ajax_url, {
+        method: "POST",
+        body: formData,
+      });
+  
+      const data = await response.json();
+  
+      if (data.success) {
+        console.log("Server Response:", data);
+        // alert(data.data.message);
+        window.location.reload(); // Reload the page to see the new team
+      } else {
+        alert(data.message);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("An error occurred. Please try again.");
     }
-  } catch (error) {
-    console.error("Error:", error);
-    alert("An error occurred. Please try again.");
-  }
-});
+  });
+}
 
 let teamId = null; // Declare teamId outside the function`
 document.querySelectorAll(".single_team_list").forEach((item) => {
@@ -79,7 +83,7 @@ document.querySelectorAll(".single_team_list").forEach((item) => {
       const data = await response.json();
 
       if (data.success) {
-        console.log("Server Response:", data.data.message);
+        console.log("Server Response:", data);
         const teamMembers = data.data.message; // Assuming this is an array of team members
         const teamMemberList = document.querySelector(".team_member_list");
         teamMemberList.innerHTML = ""; // Clear previous members
@@ -95,13 +99,45 @@ document.querySelectorAll(".single_team_list").forEach((item) => {
             1; // Random image URL for demo purposes
           img.alt = "";
 
-          // const currentgone
+          const deleteButton = document.createElement("button");
+          deleteButton.textContent = "x";
+          deleteButton.classList.add("delete_member_button");
+          deleteButton.addEventListener("click", async function () {
 
+            const deleteFormData = new FormData();
+            deleteFormData.append("action", "delete_team_member");
+            deleteFormData.append("team_member_email", member);
+            deleteFormData.append("team_id", teamId);
+
+            try {
+              const deleteResponse = await fetch(ajax_object.ajax_url, {
+                method: "POST",
+                body: deleteFormData,
+              });
+
+              const deleteData = await deleteResponse.json();
+              if (deleteData.success) {
+                console.log("Server Response:", deleteData.data.message);
+                // Remove the member from the list
+                li.remove();
+                // alert(deleteData.data.message);
+                // Optionally, you can also reload the team members list here
+                // window.location.reload(); // Reload the page to see the updated team members
+              } else {
+                alert(deleteData.message);
+              }
+            } catch (error) {
+              console.error("Error:", error);
+              alert("An error occurred while deleting the member. Please try again.");
+            }
+          });
+          
           // Append the image to the li
           li.appendChild(img);
-
+          
           // Add the text content after the image
           li.appendChild(document.createTextNode(member));
+          li.appendChild(deleteButton);
 
           // Add the li to the team member list
           teamMemberList.appendChild(li);
@@ -123,17 +159,56 @@ document.querySelectorAll(".single_team_list").forEach((item) => {
     closemodal.addEventListener("click", function () {
       teamModal.classList.remove("open");
     });
+
+    const deleteTeamButton = document.querySelector(".delete_team_btn");
+    if(deleteTeamButton)
+    {
+      const newDeleteTeamButton = deleteTeamButton.cloneNode(true);
+      deleteTeamButton.parentNode.replaceChild(newDeleteTeamButton, deleteTeamButton);
+      newDeleteTeamButton.addEventListener("click", async function () {
+        const formData = new FormData();
+        formData.append("action", "delete_team");
+        formData.append("team_id", teamId);
+
+        try {
+          const response = await fetch(ajax_object.ajax_url, {
+            method: "POST",
+            body: formData,
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            console.log("Server Response:", data.data.message);
+            // alert(data.data.message);
+            window.location.reload(); // Reload the page to see the updated team
+          } else {
+            alert(data.message);
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          alert("An error occurred. Please try again.");
+        }
+      });
+    }
+
   });
 });
 
 invite_member_form = document.getElementById("invite_member_form");
 invite_member_form.addEventListener("submit", async function (event) {
   event.preventDefault(); // Prevent the default form submission
-  const formData = new FormData(invite_member_form);
+  const emailField = document.querySelector(".recipient_email");
+  emailField.disabled  = true;
+  emailField.style.opacity = 0.5;
+ 
+  const formData = new FormData();
   // const email = formData.get("recipient_email");
+  const recipient_email = emailField.value;
 
   formData.append("action", "send_invite");
   formData.append("team_id", teamId);
+  formData.append("recipient_email",recipient_email);
 
   try {
     const response = await fetch(ajax_object.ajax_url, {
@@ -144,35 +219,77 @@ invite_member_form.addEventListener("submit", async function (event) {
     const data = await response.json();
 
     if (data.success) {
-      console.log("Server Response:", data);
-      const emailField = document.querySelector(".recipient_email");
+      // console.log("Server Response:",  data.data.message);
       emailField.value = ""; // Clear the input field after sending the invite
       const teamMemberList = document.querySelector(".team_member_list");
       teamMemberList.innerHTML = ""; // Clear previous members
       const teamMembers = data.data.message; // Assuming this is an array of team members
-      teamMembers.forEach((member) => {
-        const li = document.createElement("li");
-        li.classList.add("team_member_list_item");
-
-        // Create the image element
-        const img = document.createElement("img");
-        img.src =
-          "https://i.pravatar.cc/24?u=" + Math.floor(Math.random() * 1000) + 1; // Random image URL for demo purposes
-        img.alt = "";
-
-        // Append the image to the li
-        li.appendChild(img);
-
-        // Add the text content after the image
-        li.appendChild(document.createTextNode(member));
-
-        // Add the li to the team member list
-        teamMemberList.appendChild(li);
-      });
+      console.log(teamMembers);
+      if(Array.isArray(teamMembers)){
+        teamMembers.forEach((member) => {
+          const li = document.createElement("li");
+          li.classList.add("team_member_list_item");
+  
+          // Create the image element
+          const img = document.createElement("img");
+          img.src =
+            "https://i.pravatar.cc/24?u=" + Math.floor(Math.random() * 1000) + 1; // Random image URL for demo purposes
+          img.alt = "";
+  
+          const deleteButton = document.createElement("button");
+          deleteButton.textContent = "x";
+          deleteButton.classList.add("delete_member_button");
+          deleteButton.addEventListener("click", async function () {
+            const deleteFormData = new FormData();
+            deleteFormData.append("action", "delete_team_member");
+            deleteFormData.append("team_member_email", member);
+            deleteFormData.append("team_id", teamId);
+  
+            try {
+              const deleteResponse = await fetch(ajax_object.ajax_url, {
+                method: "POST",
+                body: deleteFormData,
+              });
+  
+              const deleteData = await deleteResponse.json();
+              if (deleteData.success) {
+                console.log("Server Response:", deleteData.data.message);
+  
+                li.remove();
+  
+  
+  
+              } else {
+                alert(deleteData.message);
+              }
+            } catch (error) {
+              console.error("Error:", error);
+              alert("An error occurred while deleting the member. Please try again.");
+            }
+          });
+  
+          // Append the image to the li
+          li.appendChild(img);
+  
+          // Add the text content after the image
+          li.appendChild(document.createTextNode(member));
+  
+          li.appendChild(deleteButton);
+  
+          // Add the li to the team member list
+          teamMemberList.appendChild(li);
+        });
+        
+        
+      }
+      emailField.disabled = false;
+      emailField.style.opacity = 1;
     } else {
       alert(data.data.message);
       const emailField = document.querySelector(".recipient_email");
       emailField.value = ""; // Clear the input field after sending the invite
+      emailField.disabled = false;  
+      emailField.style.opacity = 1;
     }
   } catch (error) {
     console.error("Error:", error);
@@ -183,40 +300,45 @@ invite_member_form.addEventListener("submit", async function (event) {
 /* ===============crate project=================== */
 
 const createProjectForm = document.querySelector(".create_project_form");
-document
-  .querySelector(".toggle_project_button")
-  .addEventListener("click", function () {
+const toggleProjectButton = document.querySelector(".toggle_project_button");
+
+
+if(toggleProjectButton){
+  toggleProjectButton.addEventListener("click", function () {
     createProjectForm.classList.toggle("open");
   });
+}
 
-createProjectForm.addEventListener("submit", async function (event) {
-  event.preventDefault(); // Prevent the default form submission
-  const formData = new FormData(createProjectForm);
-  const projectName = formData.get("project_name");
-  formData.append("action", "create_project");
-
-  formData.append("project_name", projectName);
-
-  try {
-    const response = await fetch(ajax_object.ajax_url, {
-      method: "POST",
-      body: formData,
-    });
-
-    const data = await response.json();
-
-    if (data.success) {
-      console.log("Server Response:", data);
-      // alert(data.data.message);
-      window.location.reload(); // Reload the page to see the new project
-    } else {
-      alert(data.message);
+if(createProjectForm){
+  createProjectForm.addEventListener("submit", async function (event) {
+    event.preventDefault(); // Prevent the default form submission
+    const formData = new FormData(createProjectForm);
+    const projectName = formData.get("project_name");
+    formData.append("action", "create_project");
+  
+    formData.append("project_name", projectName);
+  
+    try {
+      const response = await fetch(ajax_object.ajax_url, {
+        method: "POST",
+        body: formData,
+      });
+  
+      const data = await response.json();
+  
+      if (data.success) {
+        console.log("Server Response:", data);
+        // alert(data.data.message);
+        window.location.reload(); // Reload the page to see the new project
+      } else {
+        alert(data.message);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("An error occurred. Please try again.");
     }
-  } catch (error) {
-    console.error("Error:", error);
-    alert("An error occurred. Please try again.");
-  }
-});
+  });
+}
 let projectId = null; // Declare projectId outside the function
 
 document.querySelectorAll(".single_project_list").forEach((project) => {
@@ -248,6 +370,7 @@ document.querySelectorAll(".single_project_list").forEach((project) => {
       const data = await response.json();
 
       if (data.success) {
+        console.log(data);
         document.querySelector(".right_sidebar").classList.toggle("open");
         const projectDetails = data.data.message; // Assuming this is an array of project details
         console.log(projectDetails);
@@ -279,6 +402,37 @@ document.querySelectorAll(".single_project_list").forEach((project) => {
           li.innerHTML = `<img src="https://i.pravatar.cc/24?u=${
             Math.floor(Math.random() * 1000) + 1
           }" alt=""> ${member}`; // Add member email to the list
+
+          const deleteButton = document.createElement("button");
+          deleteButton.textContent = "x";
+          deleteButton.classList.add("delete__project_member_button");
+          deleteButton.addEventListener("click", async function () {
+            const deleteFormData = new FormData();
+            deleteFormData.append("action", "delete_project_member");
+            deleteFormData.append("project_id", projectId);
+            deleteFormData.append("project_member_email", member);
+            
+            try {
+              const response = await fetch(ajax_object.ajax_url, {
+                method: "POST",
+                body: deleteFormData,
+              });
+              const data = await response.json();
+              if (data.success) {
+                console.log("Member deleted successfully:", data.data.message);
+                li.remove();
+              } else {
+                alert(data.message);
+              }
+            } catch (error) {
+              console.error("Error:", error);
+              alert("An error occurred while deleting the member. Please try again.");
+            }
+          });
+
+          if(data.data.accessed){
+            li.appendChild(deleteButton); 
+          }
           projectMemberList.appendChild(li);
         });
 
@@ -316,6 +470,38 @@ document.querySelectorAll(".single_project_list").forEach((project) => {
           projectDueDateInput.value = dueDate ? dueDate : "2018-07-22"; // Handle null or undefined values
           projectPriorityInput.value = priority;
           projectStatusInput.value = status ? status : "on-hold";
+        }
+
+        const deleteProjectBtn = document.querySelector(".delete_project_btn");
+        if (deleteProjectBtn) {
+          const newDeleteProjectBtn = deleteProjectBtn.cloneNode(true);
+          deleteProjectBtn.parentNode.replaceChild(
+            newDeleteProjectBtn,
+            deleteProjectBtn
+          );
+          newDeleteProjectBtn.addEventListener("click", async function () {
+            const formData = new FormData();
+            formData.append("action", "delete_project");
+            formData.append("project_id", projectId);
+            
+            try {
+              const response = await fetch(ajax_object.ajax_url, {
+                method: "POST",
+                body: formData,
+              });
+              const data = await response.json();
+              if (data.success) {
+                console.log("Project deleted successfully:", data.data.message);
+                window.location.reload(); // Reload the page to see the updated project list
+
+              } else {
+                alert(data.data.message);
+              }
+            } catch (error) {
+              console.error("Error:", error);
+              alert("An error occurred while deleting the project. Please try again.");
+            }
+          });
         }
 
         const closeEditProjectModal = document.querySelector(
@@ -429,12 +615,41 @@ document
             1; // Random image URL for demo purposes
           img.alt = "";
 
+          const deleteButton = document.createElement("button");
+          deleteButton.textContent = "x";
+          deleteButton.classList.add("delete__project_member_button");
+          deleteButton.addEventListener("click", async function () {
+            const deleteFormData = new FormData();
+            deleteFormData.append("action", "delete_project_member");
+            deleteFormData.append("project_id", projectId);
+            deleteFormData.append("project_member_email", member);
+
+            try {
+              const response = await fetch(ajax_object.ajax_url, {
+                method: "POST",
+                body: deleteFormData,
+              });
+              const data = await response.json();
+              if (data.success) {
+                console.log("Member deleted successfully:", data.data.message);
+                li.remove();
+              } else {
+                alert(data.message);
+              }
+            } catch (error) {
+              console.error("Error:", error);
+              alert("An error occurred while deleting the member. Please try again.");
+            }
+          });
+          
+          
           // Append the image to the li
           li.appendChild(img);
-
+          
           // Add the text content after the image
           li.appendChild(document.createTextNode(member));
-
+          li.appendChild(deleteButton); // Append the delete button to the list item
+          
           // Add the li to the project member list
           document.querySelector(".project_member_list").appendChild(li);
         });

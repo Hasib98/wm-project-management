@@ -5,46 +5,47 @@
  */
 ?>
 
-<div class="container">
-    <div>
-        <h1>Create Team</h1>
-        <button class="create_team_btn">+</button>
-        <div class="team_list"></div>
-        <form id="team_member_form">
-            <div>Add Member to Team</div>
-            
+<div class="team">
+        <div class="team_name_container">
+            <h3>Teams</h3>
+            <button class="toggle_team_button">+</button>
+        </div>
+        <form class="create_team_form">
+            <input name="team_name" type="text" placeholder="Create a new team" class="create_team_input" required>
+
+        </form>
+
+        <ul class="team_list">
             <?php
-                
+                // Custom query to get team posts
                 $args = array(
                     'post_type' => 'team',
-                    'posts_per_page' => -1, 
+                    'posts_per_page' => -1, // Get all posts. You can limit this if needed
                     'post_status' => 'publish',
                     'orderby' => 'title',
                     'order' => 'ASC'
                 );
 
                 $team_query = new WP_Query($args);
-                
+
+                // Check if we have posts
                 if ($team_query->have_posts()) : ?>
-            <select name="teams" id="teams">
-                <?php
+
+            <?php
+                        // Start the loop
                         while ($team_query->have_posts()) : $team_query->the_post();
-                            
+                            // Get the post ID
                             $post_id = get_the_ID();
                         ?>
-                <option value="<?php echo $post_id; ?>"><?php the_title(); ?></option>
-                <?php endwhile; ?>
-                <?php
-                   
+            <li class="single_team_list" value="<?php echo $post_id; ?>"><?php the_title(); ?></>
+            </li>
+            <?php endwhile; ?>
+            <?php
+                    // Reset post data
                     wp_reset_postdata();
 
                 else : ?>
-                <p>No teams found.</p>
-                <?php endif; ?>
-            </select>
-            <input id="add_team_member_field" type="email">
-            <button id="add_team_member_btn" type="submit">Add Memmber</button>
-        </form>
-    </div>
-</div>
-
+            <p>No teams found.</p>
+            <?php endif; ?>
+        </ul>
+ </div>

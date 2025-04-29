@@ -25,55 +25,21 @@
 
 
 <div class="sidebar open">
-    <div class="team">
-        <div class="team_name_container">
-            <h3>Teams</h3>
-            <button class="toggle_team_button">+</button>
-        </div>
-        <form class="create_team_form">
-            <input name="team_name" type="text" placeholder="Create a new team" class="create_team_input" required>
-
-        </form>
-
-        <ul class="team_list">
-            <?php
-                // Custom query to get team posts
-                $args = array(
-                    'post_type' => 'team',
-                    'posts_per_page' => -1, // Get all posts. You can limit this if needed
-                    'post_status' => 'publish',
-                    'orderby' => 'title',
-                    'order' => 'ASC'
-                );
-
-                $team_query = new WP_Query($args);
-
-                // Check if we have posts
-                if ($team_query->have_posts()) : ?>
-
-            <?php
-                        // Start the loop
-                        while ($team_query->have_posts()) : $team_query->the_post();
-                            // Get the post ID
-                            $post_id = get_the_ID();
-                        ?>
-            <li class="single_team_list" value="<?php echo $post_id; ?>"><?php the_title(); ?></>
-            </li>
-            <?php endwhile; ?>
-            <?php
-                    // Reset post data
-                    wp_reset_postdata();
-
-                else : ?>
-            <p>No teams found.</p>
-            <?php endif; ?>
-        </ul>
-    </div>
+    <?php 
+    if($accessed_user) {
+        include plugin_dir_path( __FILE__ ) . 'templates/part-create_team.php';
+    } 
+    ?>
+   
 
     <div class="project">
         <div class="project_name_container">
             <h3>Projects</h3>
-            <button class="toggle_project_button">+</button>
+            <?php 
+            if($accessed_user){
+                echo '<button class="toggle_project_button">+</button>';
+            }
+            ?>
         </div>
         <form class="create_project_form">
             <input name="project_name" type="text" placeholder="Create a new project" class="create_project_input"
@@ -125,6 +91,7 @@
     <div class="team_modal_content">
         <span class="close_team_modal">&times;</span>
         <h2><span id="team_name"></span> Members</h2>
+        <button class="delete_team_btn">Delete</button>
         <form id="invite_member_form">
             <input class="recipient_email" name="recipient_email" type="email" placeholder="Add Team Member by Email"
                 required>
@@ -143,20 +110,41 @@
 
 
 <div class="right_sidebar">
-    <button class="edit_project_btn">Edit Project</button>
+    <?php
+    
+    if ($accessed_user) {
+        echo '<button class="edit_project_btn">Edit Project</button>';   
+        echo '<button class="delete_project_btn">Delete</button>';
+    }
+    ?>
+    
     <span class="close_right_sidebar">&times;</span>
     <div class="right_sidebar_content">
 
         <h2 class="project_title">Project Name</h2>
         <p class="project_description">Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatibus.
         </p>
-        <div class="project_due_date"></div>
-        <div class="project_priority"></div> <!-- Added priority div -->
-        <div class="project_status"></div> <!-- Added status div -->
+        <div class="data_container">
+            <label for="">Due Date:</label>
+            <div class="project_due_date"></div>
+        </div>
+        <div class="data_container">
+            <label for="">Priority:</label> <!-- Added label for priority -->
+            <div class="project_priority"></div> <!-- Added priority div -->
+        </div>
+        <div class="data_container">
+            <label for="">Status:</label> <!-- Added label for status -->
+            <div class="project_status"></div> <!-- Added status div -->
+        </div>
+    
         <div class="add_member_to_project_container">
             <div class="add_member_to_project_header">
                 <h3>Add Member</h3>
-                <button class="add_member_to_project_button">+</button>
+                <?php 
+                if($accessed_user) {
+                    echo '<button class="add_member_to_project_button">+</button>';
+                }
+                ?>
             </div>
             <form class="add_member_to_project_form">
                 <select class="team_list" name="team_list" id="team_list">
@@ -244,3 +232,8 @@
 </div>
 
 <!-- "2018-07-22" -->
+
+<div class="nutetops">
+    <!-- Additional content can be added here -->
+
+</div>  
