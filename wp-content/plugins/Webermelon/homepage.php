@@ -82,7 +82,7 @@
         </form>
 
         <ul class="project_list">
-        <?php
+            <?php
                 // Custom query to get team posts
                 $args = array(
                     'post_type' => 'projects',
@@ -126,10 +126,12 @@
         <span class="close_team_modal">&times;</span>
         <h2><span id="team_name"></span> Members</h2>
         <form id="invite_member_form">
-            <input name="recipient_email" type="email" placeholder="Add Team Member by Email" required>
+            <input class="recipient_email" name="recipient_email" type="email" placeholder="Add Team Member by Email"
+                required>
         </form>
         <ul class="team_member_list">
-            <li><img src="https://i.pravatar.cc/24" alt="">test@testmail.com</li>
+            <li><img src="https://i.pravatar.cc/24" alt="">test@testmail.com <span
+                    class="delete_team_member_btn">&times;</span></li>
             <li><img src="https://i.pravatar.cc/24" alt="">test@testmail.com</li>
             <li><img src="https://i.pravatar.cc/24" alt="">test@testmail.com</li>
             <li><img src="https://i.pravatar.cc/24" alt="">test@testmail.com</li>
@@ -144,9 +146,10 @@
     <button class="edit_project_btn">Edit Project</button>
     <span class="close_right_sidebar">&times;</span>
     <div class="right_sidebar_content">
-    
+
         <h2 class="project_title">Project Name</h2>
-        <p class="project_description">Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatibus.</p>
+        <p class="project_description">Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatibus.
+        </p>
         <div class="project_due_date"></div>
         <div class="project_priority"></div> <!-- Added priority div -->
         <div class="project_status"></div> <!-- Added status div -->
@@ -197,8 +200,8 @@
             </form>
         </div>
         <ul class="project_member_list">
-            
-          <!--   <li><img src="https://i.pravatar.cc/24" alt=""> test@test.com</li>
+
+            <!--   <li><img src="https://i.pravatar.cc/24" alt=""> test@test.com</li>
             <li><img src="https://i.pravatar.cc/24" alt=""> alplha@alpha.com</li> -->
         </ul> <!-- Added members div -->
 
@@ -209,7 +212,7 @@
             <li><img src="https://i.pravatar.cc/24" alt="">
             alplha@alpha.com</li>
         </ul> -->
-     
+
     </div>
 </div>
 
@@ -219,8 +222,8 @@
         <h2>Edit Project</h2>
         <form id="edit_project_form">
             <input class="project_name_input" name="project_name" type="text" placeholder="Project Name" required>
-            <textarea class="project_description_input" name="project_description" id="" cols="30" rows="5" placeholder="Project Description"
-                required></textarea>
+            <textarea class="project_description_input" name="project_description" id="" cols="30" rows="5"
+                placeholder="Project Description" required></textarea>
             <input class="project_due_date_input" name="project_due_date" type="date" placeholder="Due Date" required>
             <select class="project_priority_input" name="project_priority" id="">
                 <option value="">Select Priority</option>

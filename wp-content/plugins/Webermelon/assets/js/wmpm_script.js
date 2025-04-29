@@ -52,6 +52,18 @@ createTeamForm.addEventListener("submit", async function (event) {
 let teamId = null; // Declare teamId outside the function`
 document.querySelectorAll(".single_team_list").forEach((item) => {
   item.addEventListener("click", async function () {
+    if (document.querySelector(".team_modal").classList.contains("open")) {
+      document.querySelector(".team_modal").classList.remove("open");
+    }
+    if (document.querySelector(".right_sidebar").classList.contains("open")) {
+      document.querySelector(".right_sidebar").classList.remove("open");
+    }
+    if (
+      document.querySelector(".edit_project_modal").classList.contains("open")
+    ) {
+      document.querySelector(".edit_project_modal").classList.remove("open");
+    }
+
     teamId = this.getAttribute("value");
 
     const formData = new FormData();
@@ -82,6 +94,8 @@ document.querySelectorAll(".single_team_list").forEach((item) => {
             Math.floor(Math.random() * 1000) +
             1; // Random image URL for demo purposes
           img.alt = "";
+
+          // const currentgone
 
           // Append the image to the li
           li.appendChild(img);
@@ -131,16 +145,40 @@ invite_member_form.addEventListener("submit", async function (event) {
 
     if (data.success) {
       console.log("Server Response:", data);
+      const emailField = document.querySelector(".recipient_email");
+      emailField.value = ""; // Clear the input field after sending the invite
+      const teamMemberList = document.querySelector(".team_member_list");
+      teamMemberList.innerHTML = ""; // Clear previous members
+      const teamMembers = data.data.message; // Assuming this is an array of team members
+      teamMembers.forEach((member) => {
+        const li = document.createElement("li");
+        li.classList.add("team_member_list_item");
+
+        // Create the image element
+        const img = document.createElement("img");
+        img.src =
+          "https://i.pravatar.cc/24?u=" + Math.floor(Math.random() * 1000) + 1; // Random image URL for demo purposes
+        img.alt = "";
+
+        // Append the image to the li
+        li.appendChild(img);
+
+        // Add the text content after the image
+        li.appendChild(document.createTextNode(member));
+
+        // Add the li to the team member list
+        teamMemberList.appendChild(li);
+      });
     } else {
       alert(data.data.message);
+      const emailField = document.querySelector(".recipient_email");
+      emailField.value = ""; // Clear the input field after sending the invite
     }
   } catch (error) {
     console.error("Error:", error);
     alert("An error occurred. Please try again.");
   }
 });
-
-
 
 /* ===============crate project=================== */
 
@@ -158,7 +196,7 @@ createProjectForm.addEventListener("submit", async function (event) {
   formData.append("action", "create_project");
 
   formData.append("project_name", projectName);
-  
+
   try {
     const response = await fetch(ajax_object.ajax_url, {
       method: "POST",
@@ -178,23 +216,24 @@ createProjectForm.addEventListener("submit", async function (event) {
     console.error("Error:", error);
     alert("An error occurred. Please try again.");
   }
-} );
-let projectId = null; // Declare projectId outside the function 
-
+});
+let projectId = null; // Declare projectId outside the function
 
 document.querySelectorAll(".single_project_list").forEach((project) => {
   project.addEventListener("click", async function () {
-
-
-    if(document.querySelector(".right_sidebar").classList.contains("open")){
+    if (document.querySelector(".right_sidebar").classList.contains("open")) {
       document.querySelector(".right_sidebar").classList.remove("open");
-    } 
-    if(document.querySelector(".edit_project_modal").classList.contains("open")){
+    }
+    if (
+      document.querySelector(".edit_project_modal").classList.contains("open")
+    ) {
       document.querySelector(".edit_project_modal").classList.remove("open");
+    }
+    if (document.querySelector(".team_modal").classList.contains("open")) {
+      document.querySelector(".team_modal").classList.remove("open");
     }
 
     projectId = this.getAttribute("value");
-
 
     const formData = new FormData();
     formData.append("action", "get_project_details");
@@ -212,8 +251,7 @@ document.querySelectorAll(".single_project_list").forEach((project) => {
         document.querySelector(".right_sidebar").classList.toggle("open");
         const projectDetails = data.data.message; // Assuming this is an array of project details
         console.log(projectDetails);
-        
-      
+
         const projectName = projectDetails.project_name;
         const details = projectDetails.details;
         const dueDate = projectDetails.due_date;
@@ -223,43 +261,55 @@ document.querySelectorAll(".single_project_list").forEach((project) => {
         console.log(projectName);
         console.log(details);
         console.log(dueDate);
-        console.log(priority);  
+        console.log(priority);
         console.log(status);
         console.log(membersArray);
-
-
 
         document.querySelector(".project_title").textContent = projectName;
         document.querySelector(".project_description").textContent = details;
         document.querySelector(".project_due_date").textContent = dueDate;
         document.querySelector(".project_priority").textContent = priority;
         document.querySelector(".project_status").textContent = status;
-        const projectMemberList = document.querySelector(".project_member_list");
+        const projectMemberList = document.querySelector(
+          ".project_member_list"
+        );
         projectMemberList.innerHTML = ""; // Clear previous members
         membersArray.forEach((member) => {
           const li = document.createElement("li");
-          li.innerHTML = `<img src="https://i.pravatar.cc/24?u=${Math.floor(Math.random() * 1000) +
-            1}" alt=""> ${member}`; // Add member email to the list
+          li.innerHTML = `<img src="https://i.pravatar.cc/24?u=${
+            Math.floor(Math.random() * 1000) + 1
+          }" alt=""> ${member}`; // Add member email to the list
           projectMemberList.appendChild(li);
         });
 
-
         const editProjectBtn = document.querySelector(".edit_project_btn");
 
-        if(editProjectBtn) {
+        if (editProjectBtn) {
+          const newEditBtn = editProjectBtn.cloneNode(true);
+          editProjectBtn.parentNode.replaceChild(newEditBtn, editProjectBtn);
 
-          
-          editProjectBtn.addEventListener("click", function () {
-            document.querySelector(".edit_project_modal").classList.toggle("open");
-          } );
+          newEditBtn.addEventListener("click", function () {
+            document
+              .querySelector(".edit_project_modal")
+              .classList.toggle("open");
+          });
 
-          const projectNameInput = document.querySelector(".project_name_input");
-          const projectDescriptionInput = document.querySelector(".project_description_input");
-          const projectDueDateInput = document.querySelector(".project_due_date_input");
-          const projectPriorityInput = document.querySelector(".project_priority_input"); 
+          const projectNameInput = document.querySelector(
+            ".project_name_input"
+          );
+          const projectDescriptionInput = document.querySelector(
+            ".project_description_input"
+          );
+          const projectDueDateInput = document.querySelector(
+            ".project_due_date_input"
+          );
+          const projectPriorityInput = document.querySelector(
+            ".project_priority_input"
+          );
 
-          const projectStatusInput = document.querySelector(".project_status_input");
-
+          const projectStatusInput = document.querySelector(
+            ".project_status_input"
+          );
 
           projectNameInput.value = projectName;
           projectDescriptionInput.value = details;
@@ -268,23 +318,30 @@ document.querySelectorAll(".single_project_list").forEach((project) => {
           projectStatusInput.value = status ? status : "on-hold";
         }
 
-        const closeEditProjectModal = document.querySelector(".close_edit_project_modal");
-        if(closeEditProjectModal) {
+        const closeEditProjectModal = document.querySelector(
+          ".close_edit_project_modal"
+        );
+        if (closeEditProjectModal) {
           closeEditProjectModal.addEventListener("click", function () {
-            document.querySelector(".edit_project_modal").classList.remove("open");
-          } );
-        }
-
-        const addMemberBtn = document.querySelector(".add_member_to_project_button");
-
-        if(addMemberBtn) {
-          addMemberBtn.addEventListener("click", function () {
-            document.querySelector(".add_member_to_project_form").classList.toggle("open");
+            document
+              .querySelector(".edit_project_modal")
+              .classList.remove("open");
           });
         }
 
+        const addMemberBtn = document.querySelector(
+          ".add_member_to_project_button"
+        );
 
-        
+        if (addMemberBtn) {
+          const newAddMemberBtn = addMemberBtn.cloneNode(true);
+          addMemberBtn.parentNode.replaceChild(newAddMemberBtn, addMemberBtn);
+          newAddMemberBtn.addEventListener("click", function () {
+            document
+              .querySelector(".add_member_to_project_form")
+              .classList.toggle("open");
+          });
+        }
       } else {
         alert(data.data.message);
       }
@@ -295,19 +352,16 @@ document.querySelectorAll(".single_project_list").forEach((project) => {
   });
 });
 
-if(document.querySelector(".right_sidebar")) {
+if (document.querySelector(".right_sidebar")) {
   const closeRightSidebar = document.querySelector(".close_right_sidebar");
   closeRightSidebar.addEventListener("click", function () {
     document.querySelector(".right_sidebar").classList.remove("open");
   });
 }
 
-
-
-if(document.getElementById("team_list")) {
+if (document.getElementById("team_list")) {
   const teamList = document.getElementById("team_list");
   teamList.addEventListener("change", async function () {
-
     const selectedTeamId = this.value;
     console.log("Selected Team ID:", selectedTeamId);
     const formData = new FormData();
@@ -322,9 +376,9 @@ if(document.getElementById("team_list")) {
       if (data.success) {
         console.log("Server Response:", data.data.message);
         const teamMembers = data.data.message; // Assuming this is an array of team members
-        
+
         document.querySelector(".team_member_email").innerHTML = ""; // Clear previous members
-        if(teamMembers) {
+        if (teamMembers) {
           teamMembers.forEach((member) => {
             const option = document.createElement("option");
             option.value = member;
@@ -332,7 +386,6 @@ if(document.getElementById("team_list")) {
             document.querySelector(".team_member_email").appendChild(option);
           });
         }
-
       } else {
         alert(data.data.message);
       }
@@ -343,84 +396,89 @@ if(document.getElementById("team_list")) {
   });
 }
 
-document.querySelector('.add_member_to_project_form').addEventListener('submit', async function (event) {
-  event.preventDefault(); // Prevent the default form submission
-  const formData = new FormData(this);
+document
+  .querySelector(".add_member_to_project_form")
+  .addEventListener("submit", async function (event) {
+    event.preventDefault(); // Prevent the default form submission
+    const formData = new FormData(this);
 
-  formData.append("action", "add_member_to_project");
-  formData.append("project_id", projectId);
+    formData.append("action", "add_member_to_project");
+    formData.append("project_id", projectId);
 
-  try {
-    const response = await fetch(ajax_object.ajax_url, {
-      method: "POST",
-      body: formData,
-    });
-
-    const data = await response.json();
-
-    if (data.success) {
-      console.log("Server Response:", data);
-      document.querySelector(".project_member_list").innerHTML = ""; // Clear previous members
-      const projectMembers = data.data.message; // Assuming this is an array of project members
-      projectMembers.forEach((member) => {
-        const li = document.createElement("li");
-        li.classList.add("project_member_list_item");
-
-        // Create the image element
-        const img = document.createElement("img");
-        img.src =
-          "https://i.pravatar.cc/24?u=" +
-          Math.floor(Math.random() * 1000) +
-          1; // Random image URL for demo purposes
-        img.alt = "";
-
-        // Append the image to the li
-        li.appendChild(img);
-
-        // Add the text content after the image
-        li.appendChild(document.createTextNode(member));
-
-        // Add the li to the project member list
-        document.querySelector(".project_member_list").appendChild(li);
+    try {
+      const response = await fetch(ajax_object.ajax_url, {
+        method: "POST",
+        body: formData,
       });
-      document.querySelector(".add_member_to_project_form").classList.remove("open");
-    } else {
-      alert(data.message);
+
+      const data = await response.json();
+
+      if (data.success) {
+        console.log("Server Response:", data);
+        document.querySelector(".project_member_list").innerHTML = ""; // Clear previous members
+        const projectMembers = data.data.message; // Assuming this is an array of project members
+        projectMembers.forEach((member) => {
+          const li = document.createElement("li");
+          li.classList.add("project_member_list_item");
+
+          // Create the image element
+          const img = document.createElement("img");
+          img.src =
+            "https://i.pravatar.cc/24?u=" +
+            Math.floor(Math.random() * 1000) +
+            1; // Random image URL for demo purposes
+          img.alt = "";
+
+          // Append the image to the li
+          li.appendChild(img);
+
+          // Add the text content after the image
+          li.appendChild(document.createTextNode(member));
+
+          // Add the li to the project member list
+          document.querySelector(".project_member_list").appendChild(li);
+        });
+        document
+          .querySelector(".add_member_to_project_form")
+          .classList.remove("open");
+      } else {
+        alert(data.data.message);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("An error occurred. Please try again.");
     }
-  } catch (error) {
-    console.error("Error:", error);
-    alert("An error occurred. Please try again.");
-  }
-} );
+  });
 
+document
+  .getElementById("edit_project_form")
+  .addEventListener("submit", async function (event) {
+    event.preventDefault(); // Prevent the default form submission
+    const formData = new FormData(this);
 
-document.getElementById("edit_project_form").addEventListener("submit", async function (event) {
-  event.preventDefault(); // Prevent the default form submission
-  const formData = new FormData(this);
+    formData.append("action", "update_project");
+    formData.append("project_id", projectId);
 
-  
+    try {
+      const response = await fetch(ajax_object.ajax_url, {
+        method: "POST",
+        body: formData,
+      });
 
-  formData.append("action", "update_project");
-  formData.append("project_id", projectId);
-  
-  try {
-    const response = await fetch(ajax_object.ajax_url, {
-      method: "POST",
-      body: formData,
-    });
+      const data = await response.json();
 
-    const data = await response.json();
+      if (data.success) {
+        console.log("Server Response:", data);
+        // alert(data.data.message);
+        document.querySelector(".edit_project_modal").classList.remove("open");
+        document.querySelector(".right_sidebar").classList.remove("open");
 
-    if (data.success) {
-      console.log("Server Response:", data);
-      // alert(data.data.message);
-      document.querySelector(".edit_project_modal").classList.remove("open");
-      document.querySelector(".right_sidebar").classList.remove("open");
-    } else {
-      alert(data.message);
+        window.location.reload(); // Reload the page to see the updated project
+      } else {
+        alert(data.message);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("An error occurred. Please try again.");
     }
-  } catch (error) {
-    console.error("Error:", error);
-    alert("An error occurred. Please try again.");
-  }     
-} );
+  });

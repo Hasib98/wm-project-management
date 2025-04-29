@@ -362,33 +362,43 @@ function send_invite()
     $team_id = sanitize_text_field($_POST['team_id']);
     $team_name = get_the_title($team_id);
 
-    if(email_exists($email)) {
-        wp_send_json_error(['message' => 'User already exists.']);
+    $email_array = get_post_meta($team_id, 'member_email_array', true);
+
+    if(!email_exists($email)) {
+        
+        $token = generateRandomString(10);
+        $site_url = get_site_url();
+        
+        $message = "You have been invited to join  $team_name. Click the link to accept: $site_url/invitation?id=$team_id&token=$token";
+        
+        // Send email
+        $headers = array('Content-Type: text/plain; charset=UTF-8');    
+        
+        $temp_invite_data[] = array( $token, $email);
+        
+        update_post_meta($team_id, 'temp_invite_data', $temp_invite_data );
+        if (!wp_next_scheduled('delete_temp_invite_data_event', array($team_id))) {
+            wp_schedule_single_event(time() + 300, 'delete_temp_invite_data_event', array($team_id)); // 300 seconds = 5 minutes
+        }
+        
+        // Hook to handle the deletion
+        
+        
+        wp_mail($email, "Invitation to join $team_name", $message, $headers, "");
+        
+        wp_send_json_success([
+            'message' => "Link: $site_url/invitation?id=$team_id&token=$token\n"
+        ]);
         wp_die();
     }
-    $token = generateRandomString(10);
-    $site_url = get_site_url();
 
-    $message = "You have been invited to join  $team_name. Click the link to accept: $site_url/invitation?id=$team_id&token=$token";
-
-    // Send email
-    $headers = array('Content-Type: text/plain; charset=UTF-8');    
-
-    $temp_invite_data[] = array( $token, $email);
-
-    update_post_meta($team_id, 'temp_invite_data', $temp_invite_data );
-    if (!wp_next_scheduled('delete_temp_invite_data_event', array($team_id))) {
-        wp_schedule_single_event(time() + 300, 'delete_temp_invite_data_event', array($team_id)); // 300 seconds = 5 minutes
+    if(in_array($email, $email_array)) {
+        wp_send_json_error(['message' => 'User Already exists']);
+        wp_die();
     }
-    
-    // Hook to handle the deletion
-   
-
-    wp_mail($email, "Invitation to join $team_name", $message, $headers, "");
-
-    wp_send_json_success([
-        'message' => "Link: $site_url/invitation?id=$team_id&token=$token\n"
-    ]);
+    $email_array[] = $email; // Step 3: Push new email
+    update_post_meta($team_id, 'member_email_array', $email_array); // Step 4: Save back
+    wp_send_json_success(['message' => $email_array]);
     wp_die();
 }
 
