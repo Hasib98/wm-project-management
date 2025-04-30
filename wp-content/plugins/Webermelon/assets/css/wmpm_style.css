@@ -9,18 +9,18 @@
 
 body {
     font-family: 'Ubuntu', sans-serif;
-
+    background-color: #5f5e5e;
 }
 
 header {
     height: 40px;
-    background-color: #f8f8f8;
+    background-color: #666565;
     display: flex;
     align-items: center;
 
 
     padding: 0 10px;
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid #545454;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     z-index: 1000;
     position: fixed;
@@ -36,7 +36,7 @@ header {
     transition: background-color 0.3s;
     padding: 5px;
     border-radius: 5px;
-    background-color: #f8f8f8;
+    background-color: #999999;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
@@ -60,7 +60,7 @@ header {
 
 .sidebar {
     width: 250px;
-    background-color: #f8f8f8;
+    background-color: #666565;
     height: 100vh;
     position: fixed;
     top: 0;
@@ -710,4 +710,26 @@ ul.project_member_list li:hover {
     /* Remove default outline */
     height: 31px;
     width: 31px;
+}
+
+.task_list_container{
+    position: absolute;
+    top: 92px;
+    left: 285px;
+    color: white;
+    width: 850px;
+    background-color: black;
+    margin:  auto;
+}
+
+.task_list_container ul{
+    list-style: none;
+}
+
+.task_list_container button.assign_task_btn{
+    background-color: #9b9b9b;
+    border: none;
+    padding: 8px;
+    border-radius: 4px;
+    color: white;
 }

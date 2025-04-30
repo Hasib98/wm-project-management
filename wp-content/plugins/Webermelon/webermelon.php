@@ -129,44 +129,6 @@
     add_filter('template_include', 'wmpm_override_template', 99);
 
 
-    // Optional: remove theme styles/scripts
-
-    /* function wmpm_remove_theme_assets() {
-        if (is_page('project-manage-page')) {
-            // Replace with your actual theme style/script handles
-            wp_dequeue_style('twentytwenty-style');
-            wp_dequeue_script('twentytwenty-navigation');
-        }
-    }
-    add_action('wp_enqueue_scripts', 'wmpm_remove_theme_assets', 100); */
-
-
-
-    // Enqueue only plugin styles/scripts
-    /* function wmpm_enqueue_scripts() {
-        if (is_page('project-manage-page')) {
-            wp_enqueue_style(
-                'wmpm_style',
-                plugin_dir_url(__FILE__) . 'assets/css/wmpm_style.css',
-                array(),
-                filemtime(plugin_dir_path(__FILE__) . 'assets/css/wmpm_style.css')
-            );
-
-            wp_enqueue_script(
-                'wmpm_script',
-                plugin_dir_url(__FILE__) . 'assets/js/wmpm_script.js',
-                array('jquery'),
-                null,
-                true
-            );
-
-            wp_localize_script('wmpm_script', 'ajax_object', array('ajax_url' => admin_url('admin-ajax.php')));
-        }
-    }
-    add_action('wp_enqueue_scripts', 'wmpm_enqueue_scripts'); */
-
-
-
 
 
     function team_custom_post_type()
@@ -302,6 +264,7 @@
         update_post_meta($post_id, 'status', 'on-hold');
         
         update_post_meta($post_id, 'member_array', []);
+        update_post_meta($post_id,'task_array',[]);
 
         wp_send_json_success([
             'message' => $post_id." ".get_the_title( $post_id )
@@ -818,3 +781,22 @@
     }
 
     add_action('wp_ajax_delete_project', 'delete_project'); 
+
+
+    function add_task_to_project(){
+        if (!isset($_POST['action']) || $_POST['action'] !== 'add_task_to_project') {
+            wp_send_json_error(['message' => 'Invalid request.']);
+            wp_die();
+        }
+
+        $post_id = sanitize_text_field($_POST['project_id']);
+
+        $task_array = [
+            ['task_name' => 'Design UI', 'due_date' => '2025-05-01', 'status' => 'pending'],
+            ['task_name' => 'Develop Backend', 'due_date' => '2025-05-10', 'status' => 'in_progress']
+        ];
+          
+
+        update_post_meta($post_id , 'task_array', $task_array);
+
+    }

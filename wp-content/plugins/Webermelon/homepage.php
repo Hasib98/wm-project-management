@@ -233,7 +233,32 @@
 
 <!-- "2018-07-22" -->
 
-<div class="nutetops">
-    <!-- Additional content can be added here -->
-
-</div>  
+<div class="task_list_container">
+    <h2 class="heading"> Project Tasks</h2>
+    <h3 class="project_title">Test Project</h3>
+    <button class="assign_task_btn" >Assign Task</button>
+    <form  class="assign_task_form">
+        <input type="text" class="task_name">
+        <textarea name="" id="" class="task_description"></textarea>
+        <input type="date" class="due_date">
+        <select name="" id="" class="priority">
+            <option value="low">low</option>
+            <option value="medium">medium</option>
+            <option value="high">high</option>
+        </select>
+        <select name="" id="" class="status">
+            <option value="in progress">In Progress</option>
+            <option value="on hold">On Hold</option>
+            <option value="completed">completed</option>
+        </select>
+        <select name="" id="" class="assign_member">
+            <option value="test@testmail.com">test@testmail.com</option>
+        </select>
+    </form>
+    <ul>
+        <li>Task</li>
+        <li>Task</li>
+        <li>Task</li>
+        <li>Task</li>
+    </ul>
+</div>
