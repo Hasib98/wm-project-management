@@ -792,11 +792,15 @@
         $post_id = sanitize_text_field($_POST['project_id']);
 
         $task_array = [
-            ['task_name' => 'Design UI', 'due_date' => '2025-05-01', 'status' => 'pending'],
-            ['task_name' => 'Develop Backend', 'due_date' => '2025-05-10', 'status' => 'in_progress']
+            ['task_name' => 'Design UI', 'due_date' => '2025-05-01', 'status' => 'pending', 'assigned_to'=> 'test@testmail.com'] ,
+            ['task_name' => 'Develop Backend', 'due_date' => '2025-05-10', 'status' => 'in_progress' ,'assigned_to'=> 'test@testmail.com']
         ];
           
 
         update_post_meta($post_id , 'task_array', $task_array);
 
+        wp_send_json_success(['message' => $task_array]);
+        wp_die();
     }
+
+    add_action('wp_ajax_add_task_to_project' , 'add_task_to_project');
